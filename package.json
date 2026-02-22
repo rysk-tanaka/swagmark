@@ -1,6 +1,6 @@
 {
   "name": "swagmark",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenAPI YAML から GitHub プレビューで Swagger 風に見える Markdown を生成するツール",
   "type": "module",
   "main": "src/convert.mjs",
