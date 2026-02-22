@@ -140,7 +140,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.IMAGE }}:${{ steps.version.outputs.version }}
+            ${{ env.IMAGE }}:v${{ steps.version.outputs.version }}
             ${{ env.IMAGE }}:v${{ steps.version.outputs.major }}
             ${{ env.IMAGE }}:latest
           cache-from: type=gha
