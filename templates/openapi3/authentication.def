@@ -1,0 +1,1 @@
+> **認証必須** — {{= data.utils.getAuthenticationStr(data) }}

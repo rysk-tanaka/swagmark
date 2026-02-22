@@ -1,0 +1,85 @@
+name: Claude Code Review
+
+on:
+  # 1. claude-reviewラベルが付いたPR
+  pull_request:
+    types: [opened, synchronize, labeled]
+
+  # 2. PRコメントで@claude-reviewをメンション
+  issue_comment:
+    types: [created]
+
+  # 3. 手動実行
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR番号を指定してレビューを実行"
+        required: true
+        type: string
+
+jobs:
+  ensure-label:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Ensure claude-review label exists
+        run: gh label create claude-review --description "Claude Code Reviewを実行" --color "D97757" --force
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+  claude-review:
+    needs: ensure-label
+    if: |
+      always() &&
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'claude-review')) ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@claude-review')) ||
+      (github.event_name == 'workflow_dispatch')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: ${{ github.event.action != 'labeled' }}
+
+          prompt: |
+            このプルリクエストを日本語でレビューしてください。以下の観点からフィードバックを提供してください：
+            - コード品質とベストプラクティス
+            - 潜在的なバグや問題
+            - パフォーマンスの考慮事項
+            - セキュリティ上の懸念
+
+            回答は簡潔にまとめ、以下の形式で出力してください：
+
+            ## ✅ 良い点
+            - （主要な良い点を2-3個）
+
+            ## ⚠️ 改善点
+            - （重要な問題のみ1-3個）
+
+            ## 総合評価
+            承認 / 要修正 / コメント
+
+            ---
+            使用したモデル名と実際のトークン数、推定コストを計算して出力してください。
+            形式: 🤖 モデル: [実際のモデル名] / 💰 コスト: 入力[N]トークン, 出力[M]トークン, $[金額]
+
+          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
+          # or https://docs.claude.com/en/docs/claude-code/cli-reference for available options
+          claude_args: '--model claude-sonnet-4-6 --allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'

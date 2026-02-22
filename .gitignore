@@ -137,3 +137,9 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# swagmark generated output
+output/
+
+# macOS
+.DS_Store

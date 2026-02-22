@@ -1,0 +1,3 @@
+curl -X {{=data.methodUpper}} {{=data.url}}{{=data.requiredQueryString}}{{?data.allHeaders.length}} \{{?}}
+{{~data.allHeaders :p:index}}  -H '{{=p.name}}: {{=p.exampleValues.object}}'{{? (data.operation.requestBody && data.bodyParameter.schema) || index < data.allHeaders.length-1}} \{{?}}
+{{~}}{{? data.operation.requestBody && data.bodyParameter.schema}}{{ var defined_bodySample = data.utils.getSample(data.bodyParameter.schema,data.options,{quiet:true},data.api); }}  -d '{{=JSON.stringify(defined_bodySample)}}'{{?}}
