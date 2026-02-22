@@ -2,6 +2,6 @@
 ---
 
 Petstore OpenAPI Example (examples/petstore/petstore.yaml)
-  ├─ licenses: Apache-2.0
+  ├─ licenses: CC-BY-4.0
   ├─ source: https://github.com/OAI/learn.openapis.org/blob/main/examples/v3.0/petstore.yaml
   └─ publisher: OpenAPI Initiative

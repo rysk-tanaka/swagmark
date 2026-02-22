@@ -120,20 +120,24 @@ export async function convert(input, opts = {}) {
     ? resolve(opts.template)
     : resolve(__dirname, "../templates/openapi3");
 
-  mkdirSync(outputDir, { recursive: true });
-
   let stat;
   try {
     stat = statSync(input);
   } catch {
     throw new Error(`Input not found: ${input}`);
   }
+
+  mkdirSync(outputDir, { recursive: true });
+
   const indexEntries = [];
 
   if (stat.isDirectory()) {
     const files = readdirSync(input).filter(
       (f) => f.endsWith(".yaml") || f.endsWith(".yml"),
     );
+    if (files.length === 0) {
+      throw new Error(`No YAML files found in directory: ${input}`);
+    }
     for (const file of files) {
       const entry = await convertFile(file, input, outputDir, templateDir);
       indexEntries.push(entry);
