@@ -6,6 +6,10 @@ on:
     paths: ['package.json']
   workflow_dispatch:
 
+concurrency:
+  group: auto-release-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
   packages: write
@@ -18,7 +22,6 @@ jobs:
       contents: write
     outputs:
       released: ${{ steps.release.outputs.released }}
-      tag: ${{ steps.version.outputs.tag }}
     steps:
       - uses: actions/checkout@v6
         with:
