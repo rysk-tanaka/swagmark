@@ -80,6 +80,7 @@ async function convertFile(file, inputDir, outputDir, templateDir) {
   // 3. Insert markdownlint suppression comment
   md = `<!-- markdownlint-disable MD024 MD028 -->\n${md}`;
 
+  md = md.trimEnd() + "\n";
   writeFileSync(join(outputDir, `${name}.md`), md);
   console.log(
     `widdershins-custom: ${name}.md (${md.split("\n").length} lines)`,
@@ -107,7 +108,7 @@ function generateIndex(entries, outputDir) {
     indexLines.push("");
   }
 
-  const indexContent = indexLines.join("\n");
+  const indexContent = indexLines.join("\n").trimEnd() + "\n";
   writeFileSync(join(outputDir, "README.md"), indexContent);
   console.log(
     `README.md (${indexLines.length} lines, ${entries.length} sections)`,
