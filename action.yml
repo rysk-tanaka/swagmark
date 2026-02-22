@@ -1,0 +1,19 @@
+name: swagmark
+description: Generate Swagger-style Markdown from OpenAPI YAML
+
+inputs:
+  input:
+    description: Path to OpenAPI YAML file or directory
+    required: true
+  output:
+    description: Output directory
+    required: false
+    default: ./output
+
+runs:
+  using: composite
+  steps:
+    - run: corepack enable pnpm && pnpm install --frozen-lockfile --dir "${{ github.action_path }}"
+      shell: bash
+    - run: node "${{ github.action_path }}/bin/cli.js" "${{ inputs.input }}" -o "${{ inputs.output }}"
+      shell: bash

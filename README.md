@@ -139,7 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: rysk-tanaka/swagmark@v1
+      - uses: rysk-tanaka/swagmark@v0
         with:
           input: './openapi/api.yaml'
           output: './docs/'

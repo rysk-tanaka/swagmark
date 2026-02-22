@@ -72,6 +72,22 @@ doT.js 構文を使用。`{{= }}` で出力、`{{? }}` で条件分岐、`{{~ }}
    - MD024（重複見出し）は `<details>` 内のエンドポイント毎に同じ見出し（Parameters, Responses）が繰り返されるため不可避
    - MD028（blockquote 内の空行）は widdershins 内部生成によるもので制御不可
 
+## CI/CD
+
+- `auto-release.yml` — `package.json` の version 変更を検知し、semver タグ（`v0.1.0`）と GitHub Release を自動作成
+- `publish.yml` — Release 作成をトリガーに以下を並列実行
+  - メジャーバージョンタグ (`v0`) の更新（GitHub Actions 用）
+  - npm レジストリへの公開（`NPM_TOKEN` シークレットが必要）
+  - Docker イメージの GHCR への push
+
+リリースフロー: version bump → push to main → auto-release → publish
+
+## 配布形態
+
+- npm パッケージ: `npx swagmark` / `npm install swagmark`
+- GitHub Actions: `action.yml`（composite action）。`github.action_path` で自身の deps をインストールして CLI を実行
+- Docker: `Dockerfile`（マルチステージビルド、node:20-slim）。ENTRYPOINT が `bin/cli.js`
+
 ## ライセンス管理
 
 - `THIRD_PARTY_LICENSES` — `license-checker-rseidelsohn` で自動生成される npm 依存のライセンス情報（`--production` で本番依存のみ、`--limitAttributes` でパス情報を除外）
