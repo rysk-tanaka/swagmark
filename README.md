@@ -216,7 +216,7 @@ Node.js v21 以降で実行すると以下の警告が表示されることが�
 (node:12345) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 ```
 
-これは間接依存（widdershins → node-fetch → whatwg-url → tr46）が Node.js 組み込みの `punycode` モジュールを使用しているためで、swagmark の動作には影響しません。
+これは間接依存（widdershins → markdown-it@10）が Node.js 組み込みの `punycode` モジュールを使用しているためで、swagmark の動作には影響しません。
 
 - 組み込み `punycode` は将来のメジャーバージョンで削除予定ですが、現時点ではまだ残存しています
 - 警告を抑制するには `node --disable-warning=DEP0040` オプションを使用してください
