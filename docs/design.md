@@ -179,3 +179,7 @@ curl -X POST https://example.com/api/conversations \
 
 </details>
 ````
+
+## 参考にしたリソース
+
+- [Swagger / OpenAPI Specification REST API documentation in Markdown](https://gist.github.com/azagniotov/a4b16faf0febd12efbc6c3d7370383a6) — Markdown で REST API を Swagger 風に手書きするテンプレートアプローチ。GFM テーブルによるパラメータ・レスポンス表示や curl 実行例の構成など、swagmark の出力フォーマット設計の参考にした
