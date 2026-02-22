@@ -167,7 +167,7 @@ docker run --rm \
 swagmark/
 ├── .github/
 │   └── workflows/
-│       └── publish.yml       # npm + Docker 自動公開
+│       └── auto-release.yml  # リリース + npm + Docker 自動公開
 ├── action.yml                # GitHub Actions 定義
 ├── docs/
 │   └── design.md             # 設計方針

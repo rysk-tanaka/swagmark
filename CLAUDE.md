@@ -55,6 +55,7 @@ bin/cli.js (commander で引数パース)
 - パッケージマネージャ: pnpm
 - 主要依存: widdershins, commander, js-yaml
 - テンプレートエンジン: doT.js（widdershins 内蔵）
+- GitHub Actions: actions/checkout@v6, actions/setup-node@v6（いずれも正式リリース済み）
 
 ## テンプレート編集時の注意
 
@@ -74,13 +75,14 @@ doT.js 構文を使用。`{{= }}` で出力、`{{? }}` で条件分岐、`{{~ }}
 
 ## CI/CD
 
-- `auto-release.yml` — `package.json` の version 変更を検知し、semver タグ（`v0.1.0`）と GitHub Release を自動作成
-- `publish.yml` — Release 作成をトリガーに以下を並列実行
-  - メジャーバージョンタグ (`v0`) の更新（GitHub Actions 用）
-  - npm レジストリへの公開（`NPM_TOKEN` シークレットが必要）
-  - Docker イメージの GHCR への push
+- `auto-release.yml` — `package.json` の version 変更を検知し、以下を一連で実行
+  - semver タグ（`v0.1.0`）と GitHub Release の自動作成（常に実行）
+  - メジャーバージョンタグ (`v0`) の更新 — `vars.PUBLISH_ACTION == 'true'` で有効化
+  - npm レジストリへの公開 — `vars.PUBLISH_NPM == 'true'` + `NPM_TOKEN` シークレットで有効化
+  - Docker イメージの GHCR への push — `vars.PUBLISH_DOCKER == 'true'` で有効化
+  - `workflow_dispatch` で手動再実行にも対応（既存タグは安全にスキップ）
 
-リリースフロー: version bump → push to main → auto-release → publish
+リリースフロー: version bump → push to main → auto-release（タグ・Release 作成 → publish）
 
 ## 配布形態
 

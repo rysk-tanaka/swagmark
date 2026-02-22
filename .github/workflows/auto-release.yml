@@ -1,9 +1,14 @@
-name: Auto Release
+name: Release
 
 on:
   push:
     branches: [main]
     paths: ['package.json']
+  workflow_dispatch:
+
+concurrency:
+  group: auto-release-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -11,41 +16,147 @@ permissions:
 jobs:
   create-release:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
+    outputs:
+      released: ${{ steps.release.outputs.released }}
     steps:
+      # push は branches: [main] でフィルタ済みだが、workflow_dispatch 用に明示ガード
+      - name: Validate branch
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::このワークフローは main ブランチからのみ実行できます (現在: ${{ github.ref }})"
+          exit 1
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Extract version from package.json
+      - name: Extract version
         id: version
         run: |
           VERSION=$(jq -r '.version' package.json)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Create tag if not exists
+      - name: Create tag and release
+        id: release
         run: |
           TAG="${{ steps.version.outputs.tag }}"
+          CREATED=false
+
+          # Create tag if not exists
           if git tag -l "$TAG" | grep -Fxq "$TAG"; then
-            echo "Tag $TAG already exists, skipping"
+            echo "Tag $TAG already exists"
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git tag "$TAG"
             git push origin "$TAG"
-            echo "Created and pushed tag $TAG"
+            CREATED=true
           fi
 
-      - name: Create release with notes
-        if: success()
-        run: |
-          TAG="${{ steps.version.outputs.tag }}"
+          # Create release if not exists
           if gh release view "$TAG" > /dev/null 2>&1; then
-            echo "Release $TAG already exists, skipping"
+            echo "Release $TAG already exists"
           else
             gh release create "$TAG" --generate-notes
-            echo "Created release $TAG"
+            CREATED=true
+          fi
+
+          # push trigger: only publish on new creation
+          # workflow_dispatch: also publish for existing releases (retry scenario)
+          if [[ "$CREATED" == "true" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "released=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "released=false" >> "$GITHUB_OUTPUT"
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  update-major-tag:
+    needs: create-release
+    if: needs.create-release.outputs.released == 'true' && vars.PUBLISH_ACTION == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Update major version tag
+        run: |
+          MAJOR="v$(jq -r '.version' package.json | cut -d. -f1)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "$MAJOR"
+          git push origin "$MAJOR" --force
+
+  npm:
+    needs: create-release
+    if: needs.create-release.outputs.released == 'true' && vars.PUBLISH_NPM == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check NPM_TOKEN
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::PUBLISH_NPM=true が設定されていますが NPM_TOKEN シークレットが見つかりません"
+            exit 1
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: corepack enable pnpm && pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm
+        run: |
+          PKG_NAME=$(jq -r '.name' package.json)
+          PKG_VERSION=$(jq -r '.version' package.json)
+          pnpm publish --access public --no-git-checks || {
+            if npm view "${PKG_NAME}@${PKG_VERSION}" version > /dev/null 2>&1; then
+              echo "Version ${PKG_VERSION} already published, skipping"
+            else
+              exit 1
+            fi
+          }
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  docker:
+    needs: create-release
+    if: needs.create-release.outputs.released == 'true' && vars.PUBLISH_DOCKER == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract version for tags
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "major=$MAJOR" >> "$GITHUB_OUTPUT"
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:v${{ steps.version.outputs.version }}
+            ${{ env.IMAGE }}:v${{ steps.version.outputs.major }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
