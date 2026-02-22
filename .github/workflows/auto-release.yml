@@ -16,13 +16,17 @@ permissions:
 
 jobs:
   create-release:
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     outputs:
       released: ${{ steps.release.outputs.released }}
     steps:
+      - name: Validate branch
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::このワークフローは main ブランチからのみ実行できます (現在: ${{ github.ref }})"
+          exit 1
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
@@ -93,16 +97,22 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
+      - name: Check NPM_TOKEN
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::PUBLISH_NPM=true が設定されていますが NPM_TOKEN シークレットが見つかりません"
+            exit 1
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
       - run: corepack enable pnpm && pnpm install --frozen-lockfile
-        if: env.NODE_AUTH_TOKEN != ''
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish to npm
-        if: env.NODE_AUTH_TOKEN != ''
         run: |
           PKG_NAME=$(jq -r '.name' package.json)
           PKG_VERSION=$(jq -r '.version' package.json)
