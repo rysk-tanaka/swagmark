@@ -1,6 +1,6 @@
 # Source: OpenAPI Initiative - Learn OpenAPI
 # https://github.com/OAI/learn.openapis.org/blob/main/examples/v3.0/petstore.yaml
-# License: Apache-2.0
+# License: CC-BY-4.0
 openapi: "3.0.0"
 info:
   version: 1.0.0
