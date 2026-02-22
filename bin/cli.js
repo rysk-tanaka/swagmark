@@ -10,7 +10,12 @@ program
   .option("--no-index", "README.md の生成をスキップ")
   .version("0.1.0")
   .action(async (input, opts) => {
-    await convert(input, opts);
+    try {
+      await convert(input, opts);
+    } catch (err) {
+      console.error(`Error: ${err.message}`);
+      process.exit(1);
+    }
   });
 
 program.parse();

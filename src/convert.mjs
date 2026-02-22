@@ -108,7 +108,7 @@ function generateIndex(entries, outputDir) {
   }
 
   const indexContent = indexLines.join("\n");
-  writeFileSync(`${outputDir}/README.md`, indexContent);
+  writeFileSync(join(outputDir, "README.md"), indexContent);
   console.log(
     `README.md (${indexLines.length} lines, ${entries.length} sections)`,
   );
@@ -126,8 +126,7 @@ export async function convert(input, opts = {}) {
   try {
     stat = statSync(input);
   } catch {
-    console.error(`Error: Input not found: ${input}`);
-    process.exit(1);
+    throw new Error(`Input not found: ${input}`);
   }
   const indexEntries = [];
 
