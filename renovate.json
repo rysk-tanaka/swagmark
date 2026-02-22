@@ -1,0 +1,15 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "enabledManagers": ["npm", "github-actions"],
+  "labels": ["dependencies"],
+  "timezone": "Asia/Tokyo",
+  "schedule": ["before 9am on saturday"],
+  "packageRules": [
+    {
+      "description": "Last release 4.0.1 (2020); custom templates and markdown-it override require manual compatibility checks",
+      "matchDepNames": ["widdershins"],
+      "enabled": false
+    }
+  ]
+}
