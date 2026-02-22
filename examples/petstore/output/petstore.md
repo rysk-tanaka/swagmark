@@ -158,7 +158,7 @@ curl -X GET http://petstore.swagger.io/v1/pets/{petId} \
 <details>
 <summary>
 
-**Pet**
+<strong>Pet</strong>
 
 </summary>
 
@@ -185,7 +185,7 @@ curl -X GET http://petstore.swagger.io/v1/pets/{petId} \
 <details>
 <summary>
 
-**Pets**
+<strong>Pets</strong>
 
 </summary>
 
@@ -212,7 +212,7 @@ curl -X GET http://petstore.swagger.io/v1/pets/{petId} \
 <details>
 <summary>
 
-**Error**
+<strong>Error</strong>
 
 </summary>
 
