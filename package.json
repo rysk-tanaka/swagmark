@@ -10,6 +10,7 @@
   "scripts": {
     "start": "node bin/cli.js",
     "example": "node bin/cli.js examples/petstore/petstore.yaml -o examples/petstore/output",
+    "update-licenses": "npx license-checker --out THIRD_PARTY_LICENSES --excludePrivatePackages && cat THIRD_PARTY_LICENSES.manual >> THIRD_PARTY_LICENSES",
     "format": "prettier --write ."
   },
   "files": [
