@@ -11,10 +11,10 @@
 
 swagmark は [widdershins](https://github.com/Mermade/widdershins) のカスタム doT.js テンプレートをコアとし、OpenAPI YAML から以下の特徴を持つ Markdown を生成します。
 
-- ![🔵 GET](https://badgers.space/badge/_/GET/blue?label=&corner_radius=5) ![🟢 POST](https://badgers.space/badge/_/POST/green?label=&corner_radius=5) ![🟠 PUT](https://badgers.space/badge/_/PUT/orange?label=&corner_radius=5) ![🔴 DELETE](https://badgers.space/badge/_/DELETE/red?label=&corner_radius=5) **HTTP メソッドの色付きバッジ表示**
-- **`<details>` による折りたたみ可能なエンドポイント**（Swagger UI のアコーディオンに近い操作感）
-- **GFM テーブルによるパラメータ・レスポンス表示**
-- **curl 実行例の自動生成**
+- ![🔵 GET](https://badgers.space/badge/_/GET/blue?label=&corner_radius=5) ![🟢 POST](https://badgers.space/badge/_/POST/green?label=&corner_radius=5) ![🟠 PUT](https://badgers.space/badge/_/PUT/orange?label=&corner_radius=5) ![🔴 DELETE](https://badgers.space/badge/_/DELETE/red?label=&corner_radius=5) HTTP メソッドの色付きバッジ表示
+- `<details>` による折りたたみ可能なエンドポイント（Swagger UI のアコーディオンに近い操作感）
+- GFM テーブルによるパラメータ・レスポンス表示
+- curl 実行例の自動生成
 
 生成された Markdown は GitHub や VS Code でそのままプレビュー可能です。Swagger UI の完全再現ではなく、Markdown の制約内で最大限 Swagger 風の見た目を実現することを目的としています。
 
@@ -202,22 +202,7 @@ swagmark/
 | `code_shell.dot` | curl 例にリクエストボディ（`-d`）を追加・不要なコメント行を除去 |
 | `main.dot` | HTML タグを Markdown 見出しに置き換え・認証情報をブロッククォートに変換 |
 
-独自テンプレートを使用する場合は `--template` オプションで指定してください。
-
----
-
-## 技術的な背景
-
-GitHub の Markdown レンダラーはセキュリティのため `style` 属性や `class` 属性をサニタイズします。swagmark はこの制約内で Swagger UI に近い見た目を実現するため、以下の手法を採用しています。
-
-| 要素 | 実装方法 |
-| --- | --- |
-| HTTP メソッドの色分け | [badgers.space](https://badgers.space/) の SVG バッジ（フォールバック: Unicode 絵文字） |
-| 折りたたみ | `<details>` / `<summary>` タグ |
-| パラメータ表示 | GFM テーブル |
-| コードサンプル | fenced code block（`bash`） |
-
-詳細な設計背景は [docs/design.md](./docs/design.md) を参照してください。
+独自テンプレートを使用する場合は `--template` オプションで指定してください。設計方針の詳細は [docs/design.md](./docs/design.md) を参照してください。
 
 ---
 
@@ -225,13 +210,4 @@ GitHub の Markdown レンダラーはセキュリティのため `style` 属性
 
 MIT License — © rysk-tanaka
 
-### サードパーティライセンス
-
-| パッケージ | ライセンス |
-| --- | --- |
-| [widdershins](https://github.com/Mermade/widdershins) | MIT |
-| [doT.js](https://github.com/olado/doT) | MIT |
-| [swagger2openapi](https://github.com/Mermade/oas-kit) | BSD-3-Clause |
-| [badgers.space](https://github.com/SplittyDev/spacebadgers) | MIT（外部サービス） |
-
-詳細は [THIRD_PARTY_LICENSES](./THIRD_PARTY_LICENSES) を参照してください。
+サードパーティのライセンス情報は [THIRD_PARTY_LICENSES](./THIRD_PARTY_LICENSES) を参照してください。
