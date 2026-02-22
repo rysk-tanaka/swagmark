@@ -78,7 +78,7 @@ async function convertFile(file, inputDir, outputDir, templateDir) {
   // 2. Remove widdershins generator comment
   md = md.replace(/^<!-- Generator: Widdershins v[\d.]+ -->\n+/m, "");
   // 3. Insert markdownlint suppression comment
-  md = `<!-- markdownlint-disable MD024 MD028 -->\n${md}`;
+  md = `<!-- markdownlint-disable MD024 MD028 MD036 -->\n${md}`;
 
   md = md.trimEnd() + "\n";
   writeFileSync(join(outputDir, `${name}.md`), md);
