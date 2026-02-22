@@ -55,6 +55,7 @@ bin/cli.js (commander で引数パース)
 - パッケージマネージャ: pnpm
 - 主要依存: widdershins, commander, js-yaml
 - テンプレートエンジン: doT.js（widdershins 内蔵）
+- GitHub Actions: actions/checkout@v6, actions/setup-node@v6（いずれも正式リリース済み）
 
 ## テンプレート編集時の注意
 
