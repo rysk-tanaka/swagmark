@@ -1,46 +1,37 @@
-// Convert per-tag OpenAPI YAML files using widdershins with custom Swagger-style templates
-// Usage: node convert-custom-template.mjs
-// Output: output/widdershins-custom/<tag>.md
+// Convert OpenAPI YAML files using widdershins with custom Swagger-style templates
 
-import { readFileSync, writeFileSync, readdirSync, mkdirSync } from "fs";
-import { resolve, dirname } from "path";
+import {
+  readFileSync,
+  writeFileSync,
+  readdirSync,
+  mkdirSync,
+  statSync,
+} from "fs";
+import { resolve, dirname, basename, extname, join } from "path";
 import { fileURLToPath } from "url";
 import widdershins from "widdershins";
 import yaml from "js-yaml";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const inputDir = resolve(__dirname, "per-tag");
-const outputDir = resolve(__dirname, "output/widdershins-custom");
-const templateDir = resolve(__dirname, "../../templates/openapi3");
 
-mkdirSync(outputDir, { recursive: true });
+const badgeColors = {
+  get: "blue",
+  post: "green",
+  put: "orange",
+  delete: "red",
+  patch: "purple",
+};
 
-const files = readdirSync(inputDir).filter((f) => f.endsWith(".yaml"));
+const badgeEmojis = {
+  get: "🔵",
+  post: "🟢",
+  put: "🟠",
+  delete: "🔴",
+  patch: "🟣",
+};
 
-// Collect metadata for index generation
-const indexEntries = [];
-
-for (const file of files) {
-  const name = file.replace(".yaml", "");
-  const specText = readFileSync(`${inputDir}/${file}`, "utf-8");
-  const spec = yaml.load(specText);
-
-  // Extract endpoints metadata for index
+function extractEndpoints(spec) {
   const endpoints = [];
-  const badgeColors = {
-    get: "blue",
-    post: "green",
-    put: "orange",
-    delete: "red",
-    patch: "purple",
-  };
-  const badgeEmojis = {
-    get: "🔵",
-    post: "🟢",
-    put: "🟠",
-    delete: "🔴",
-    patch: "🟣",
-  };
   for (const [path, methods] of Object.entries(spec.paths || {})) {
     for (const [method, op] of Object.entries(methods)) {
       if (["get", "post", "put", "delete", "patch"].includes(method)) {
@@ -54,11 +45,20 @@ for (const file of files) {
       }
     }
   }
+  return endpoints;
+}
+
+async function convertFile(file, inputDir, outputDir, templateDir) {
+  const name = basename(file, extname(file));
+  const filePath = inputDir ? join(inputDir, file) : file;
+  const specText = readFileSync(filePath, "utf-8");
+  const spec = yaml.load(specText);
+
+  const endpoints = extractEndpoints(spec);
   const tag =
     Object.values(spec.paths || {})
       .flatMap((m) => Object.values(m))
       .find((op) => op?.tags)?.tags?.[0] || name;
-  indexEntries.push({ name, tag, endpoints });
 
   const options = {
     language_tabs: [{ shell: "Shell" }],
@@ -77,36 +77,82 @@ for (const file of files) {
   md = md.replace(/\[([^\]]+)\]\(https:\/\/tools\.ietf\.org[^)]+\)/g, "$1");
   // 2. Remove widdershins generator comment
   md = md.replace(/^<!-- Generator: Widdershins v[\d.]+ -->\n+/m, "");
+  // 3. Insert markdownlint suppression comment
+  md = `<!-- markdownlint-disable MD024 MD028 -->\n${md}`;
 
-  writeFileSync(`${outputDir}/${name}.md`, md);
+  writeFileSync(join(outputDir, `${name}.md`), md);
   console.log(
     `widdershins-custom: ${name}.md (${md.split("\n").length} lines)`,
   );
+
+  return { name, tag, endpoints };
 }
 
-// Generate index.md
-const indexLines = [
-  "# API Reference",
-  "",
-  `> ${files.length} セクション / ${indexEntries.reduce((sum, e) => sum + e.endpoints.length, 0)} エンドポイント`,
-  "",
-];
+function generateIndex(entries, outputDir) {
+  const indexLines = [
+    "# API Reference",
+    "",
+    `> ${entries.length} セクション / ${entries.reduce((sum, e) => sum + e.endpoints.length, 0)} エンドポイント`,
+    "",
+  ];
 
-for (const entry of indexEntries) {
-  indexLines.push(`## [${entry.tag}](./${entry.name}.md)`);
-  indexLines.push("");
-  for (const ep of entry.endpoints) {
-    indexLines.push(
-      `- ![${ep.emoji} ${ep.method}](https://badgers.space/badge/_/${ep.method}/${ep.color}?label=&corner_radius=5) \`${ep.path}\` — ${ep.summary}`,
-    );
+  for (const entry of entries) {
+    indexLines.push(`## [${entry.tag}](./${entry.name}.md)`);
+    indexLines.push("");
+    for (const ep of entry.endpoints) {
+      indexLines.push(
+        `- ![${ep.emoji} ${ep.method}](https://badgers.space/badge/_/${ep.method}/${ep.color}?label=&corner_radius=5) \`${ep.path}\` — ${ep.summary}`,
+      );
+    }
+    indexLines.push("");
   }
-  indexLines.push("");
+
+  const indexContent = indexLines.join("\n");
+  writeFileSync(join(outputDir, "README.md"), indexContent);
+  console.log(
+    `README.md (${indexLines.length} lines, ${entries.length} sections)`,
+  );
 }
 
-const indexContent = indexLines.join("\n");
-writeFileSync(`${outputDir}/README.md`, indexContent);
-console.log(
-  `README.md (${indexLines.length} lines, ${indexEntries.length} sections)`,
-);
+export async function convert(input, opts = {}) {
+  const outputDir = resolve(opts.output || "./output");
+  const templateDir = opts.template
+    ? resolve(opts.template)
+    : resolve(__dirname, "../templates/openapi3");
 
-console.log(`\nDone. Converted ${files.length} files + index to ${outputDir}`);
+  let stat;
+  try {
+    stat = statSync(input);
+  } catch {
+    throw new Error(`Input not found: ${input}`);
+  }
+
+  mkdirSync(outputDir, { recursive: true });
+
+  const indexEntries = [];
+
+  if (stat.isDirectory()) {
+    const files = readdirSync(input).filter(
+      (f) => f.endsWith(".yaml") || f.endsWith(".yml"),
+    );
+    if (files.length === 0) {
+      throw new Error(`No YAML files found in directory: ${input}`);
+    }
+    for (const file of files) {
+      const entry = await convertFile(file, input, outputDir, templateDir);
+      indexEntries.push(entry);
+    }
+  } else {
+    const entry = await convertFile(input, null, outputDir, templateDir);
+    indexEntries.push(entry);
+  }
+
+  if (opts.index !== false) {
+    generateIndex(indexEntries, outputDir);
+  }
+
+  const indexLabel = opts.index !== false ? " + index" : "";
+  console.log(
+    `\nDone. Converted ${indexEntries.length} file(s)${indexLabel} to ${outputDir}`,
+  );
+}

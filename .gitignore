@@ -139,7 +139,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # swagmark generated output
-output/
+/output/
 
 # macOS
 .DS_Store

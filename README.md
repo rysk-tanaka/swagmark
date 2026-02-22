@@ -27,34 +27,36 @@ swagmark は [widdershins](https://github.com/Mermade/widdershins) のカスタ�
 <details>
 <summary>
 
-![🟢 POST](https://badgers.space/badge/_/POST/green?label=&corner_radius=5) **`/api/users`** — ユーザー作成
+![🟢 POST](https://badgers.space/badge/_/POST/green?label=&corner_radius=5) **`/pets`** — Create a pet
 
 </summary>
 
-新しいユーザーアカウントを作成します。
-
-```bash
-curl -X POST https://example.com/api/users \
+```shell
+curl -X POST http://petstore.swagger.io/v1/pets \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer {token}' \
-  -d '{"name":"山田太郎","email":"taro@example.com"}'
+  -H 'Accept: application/json' \
+  -d '{"id":0,"name":"string","tag":"string"}'
 ```
 
 ### Parameters
 
 | Name | In | Type | Required | Description |
 | --- | --- | --- | --- | --- |
-| `name` | body | `string` | Yes | ユーザー名 |
-| `email` | body | `string` | Yes | メールアドレス |
+| body | body | Pet | true | none |
+| » id | body | integer(int64) | true | none |
+| » name | body | string | true | none |
+| » tag | body | string | false | none |
 
 ### Responses
 
-| Status | Meaning | Description |
-| --- | --- | --- |
-| **201** | Created | 作成されたユーザー |
-| **401** | Unauthorized | 認証エラー |
+| Status | Meaning | Description | Schema |
+| --- | --- | --- | --- |
+| 201 | Created | Null response | None |
+| default | Default | unexpected error | Error |
 
 </details>
+
+実際の変換結果は [examples/petstore/output/](./examples/petstore/output/) で確認できます（[Petstore OpenAPI](https://github.com/OAI/learn.openapis.org/blob/main/examples/v3.0/petstore.yaml) を変換したもの）。
 
 ---
 
@@ -96,7 +98,7 @@ npm install --save-dev swagmark
 Usage: swagmark [options] <input>
 
 Arguments:
-  input                 OpenAPI YAML ファイルのパス
+  input                 OpenAPI YAML ファイルまたはディレクトリのパス
 
 Options:
   -o, --output <dir>    出力ディレクトリ（デフォルト: ./output）
@@ -111,6 +113,9 @@ Options:
 ```bash
 # 単一ファイルの変換
 swagmark openapi.yaml -o docs/
+
+# ディレクトリ内の全 YAML を一括変換
+swagmark openapi/ -o docs/
 
 # カスタムテンプレートを使用
 swagmark openapi.yaml -o docs/ --template ./my-templates/
@@ -168,6 +173,8 @@ swagmark/
 │   └── design.md             # 設計方針
 ├── bin/
 │   └── cli.js                # CLI エントリポイント（npx 用）
+├── examples/
+│   └── petstore/             # Petstore サンプル（入力 YAML + 変換結果）
 ├── src/
 │   └── convert.mjs           # 変換ロジック本体
 ├── templates/
