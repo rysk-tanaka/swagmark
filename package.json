@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node bin/cli.js",
+    "example": "node bin/cli.js examples/petstore/petstore.yaml -o examples/petstore/output",
     "format": "prettier --write ."
   },
   "files": [
