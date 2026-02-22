@@ -12,7 +12,6 @@ concurrency:
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
   create-release:
@@ -22,6 +21,7 @@ jobs:
     outputs:
       released: ${{ steps.release.outputs.released }}
     steps:
+      # push は branches: [main] でフィルタ済みだが、workflow_dispatch 用に明示ガード
       - name: Validate branch
         if: github.ref != 'refs/heads/main'
         run: |
