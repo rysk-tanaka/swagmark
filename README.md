@@ -222,7 +222,7 @@ Node.js v21 以降で実行すると以下の警告が表示されることが�
 - 警告を抑制するには `node --disable-warning=DEP0040` オプションを使用してください
 
 ```bash
-node --disable-warning=DEP0040 $(which swagmark) input.yaml -o docs/
+NODE_OPTIONS=--disable-warning=DEP0040 swagmark input.yaml -o docs/
 ```
 
 ---
