@@ -7,7 +7,7 @@ import {
   mkdirSync,
   statSync,
 } from "fs";
-import { resolve, dirname, basename } from "path";
+import { resolve, dirname, basename, join } from "path";
 import { fileURLToPath } from "url";
 import widdershins from "widdershins";
 import yaml from "js-yaml";
@@ -50,7 +50,7 @@ function extractEndpoints(spec) {
 
 async function convertFile(file, inputDir, outputDir, templateDir) {
   const name = basename(file, ".yaml");
-  const filePath = inputDir ? `${inputDir}/${file}` : file;
+  const filePath = inputDir ? join(inputDir, file) : file;
   const specText = readFileSync(filePath, "utf-8");
   const spec = yaml.load(specText);
 
@@ -77,8 +77,10 @@ async function convertFile(file, inputDir, outputDir, templateDir) {
   md = md.replace(/\[([^\]]+)\]\(https:\/\/tools\.ietf\.org[^)]+\)/g, "$1");
   // 2. Remove widdershins generator comment
   md = md.replace(/^<!-- Generator: Widdershins v[\d.]+ -->\n+/m, "");
+  // 3. Insert markdownlint suppression comment
+  md = `<!-- markdownlint-disable MD024 MD028 -->\n${md}`;
 
-  writeFileSync(`${outputDir}/${name}.md`, md);
+  writeFileSync(join(outputDir, `${name}.md`), md);
   console.log(
     `widdershins-custom: ${name}.md (${md.split("\n").length} lines)`,
   );
@@ -120,7 +122,13 @@ export async function convert(input, opts = {}) {
 
   mkdirSync(outputDir, { recursive: true });
 
-  const stat = statSync(input);
+  let stat;
+  try {
+    stat = statSync(input);
+  } catch {
+    console.error(`Error: Input not found: ${input}`);
+    process.exit(1);
+  }
   const indexEntries = [];
 
   if (stat.isDirectory()) {
@@ -138,7 +146,8 @@ export async function convert(input, opts = {}) {
     generateIndex(indexEntries, outputDir);
   }
 
+  const indexLabel = opts.index !== false ? " + index" : "";
   console.log(
-    `\nDone. Converted ${indexEntries.length} file(s) + index to ${outputDir}`,
+    `\nDone. Converted ${indexEntries.length} file(s)${indexLabel} to ${outputDir}`,
   );
 }

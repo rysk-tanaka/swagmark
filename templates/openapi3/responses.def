@@ -12,7 +12,7 @@
 
 {{= data.tags.section }}
 
-#### Responses
+### Responses
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
@@ -25,7 +25,7 @@
 {{~}}
 {{? data.responseSchemas }}
 
-#### Response Schema
+### Response Schema
 {{~ data.responses :response}}
 {{? response.content && !response.$ref && !data.utils.isPrimitive(response.type)}}
 {{? Object.keys(response.content).length }}
@@ -58,7 +58,7 @@ Status Code **{{=response.status}}**
 {{?}}
 
 {{? enums.length > 0 }}
-##### Enumerated Values
+#### Enumerated Values
 
 |Property|Value|
 |---|---|
@@ -78,7 +78,7 @@ Status Code **{{=response.status}}**
 {{ data.responseHeaders = data.utils.getResponseHeaders(data); }}
 {{? data.responseHeaders.length }}
 
-#### Response Headers
+### Response Headers
 
 |Status|Header|Type|Format|Description|
 |---|---|---|---|---|

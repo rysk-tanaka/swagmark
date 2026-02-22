@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD024 MD028 -->
 
 # Swagger Petstore v1.0.0
 
@@ -22,7 +23,7 @@ curl -X GET http://petstore.swagger.io/v1/pets \
 
 ```
 
-#### Parameters
+### Parameters
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
@@ -42,14 +43,14 @@ curl -X GET http://petstore.swagger.io/v1/pets \
 ]
 ```
 
-#### Responses
+### Responses
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
 |200|OK|A paged array of pets|[Pets](#schemapets)|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
-#### Response Headers
+### Response Headers
 
 |Status|Header|Type|Format|Description|
 |---|---|---|---|---|
@@ -82,7 +83,7 @@ curl -X POST http://petstore.swagger.io/v1/pets \
 }
 ```
 
-#### Parameters
+### Parameters
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
@@ -102,7 +103,7 @@ curl -X POST http://petstore.swagger.io/v1/pets \
 }
 ```
 
-#### Responses
+### Responses
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
@@ -124,7 +125,7 @@ curl -X GET http://petstore.swagger.io/v1/pets/{petId} \
 
 ```
 
-#### Parameters
+### Parameters
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
@@ -142,7 +143,7 @@ curl -X GET http://petstore.swagger.io/v1/pets/{petId} \
 }
 ```
 
-#### Responses
+### Responses
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
@@ -170,7 +171,7 @@ curl -X GET http://petstore.swagger.io/v1/pets/{petId} \
 
 ```
 
-#### Properties
+### Properties
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
@@ -199,7 +200,7 @@ curl -X GET http://petstore.swagger.io/v1/pets/{petId} \
 
 ```
 
-#### Properties
+### Properties
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
@@ -223,7 +224,7 @@ curl -X GET http://petstore.swagger.io/v1/pets/{petId} \
 
 ```
 
-#### Properties
+### Properties
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
