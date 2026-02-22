@@ -98,7 +98,7 @@ npm install --save-dev swagmark
 Usage: swagmark [options] <input>
 
 Arguments:
-  input                 OpenAPI YAML ファイルのパス
+  input                 OpenAPI YAML ファイルまたはディレクトリのパス
 
 Options:
   -o, --output <dir>    出力ディレクトリ（デフォルト: ./output）
@@ -113,6 +113,9 @@ Options:
 ```bash
 # 単一ファイルの変換
 swagmark openapi.yaml -o docs/
+
+# ディレクトリ内の全 YAML を一括変換
+swagmark openapi/ -o docs/
 
 # カスタムテンプレートを使用
 swagmark openapi.yaml -o docs/ --template ./my-templates/

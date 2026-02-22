@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node bin/cli.js",
     "example": "node bin/cli.js examples/petstore/petstore.yaml -o examples/petstore/output",
-    "update-licenses": "npx license-checker-rseidelsohn --production --excludePackages \"$npm_package_name@$npm_package_version\" --out THIRD_PARTY_LICENSES --limitAttributes licenses,repository,publisher && cat THIRD_PARTY_LICENSES.manual >> THIRD_PARTY_LICENSES",
+    "update-licenses": "license-checker-rseidelsohn --production --excludePackages \"$npm_package_name@$npm_package_version\" --out THIRD_PARTY_LICENSES --limitAttributes licenses,repository,publisher && cat THIRD_PARTY_LICENSES.manual >> THIRD_PARTY_LICENSES",
     "format": "prettier --write ."
   },
   "files": [
@@ -35,6 +35,7 @@
     "widdershins": "^4.0.1"
   },
   "devDependencies": {
+    "license-checker-rseidelsohn": "^4.4.2",
     "prettier": "^3.8.1"
   }
 }

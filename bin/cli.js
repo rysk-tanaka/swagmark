@@ -10,7 +10,7 @@ const pkg = JSON.parse(readFileSync(resolve(__dirname, "../package.json"), "utf-
 
 program
   .name("swagmark")
-  .argument("<input>", "OpenAPI YAML ファイルのパス")
+  .argument("<input>", "OpenAPI YAML ファイルまたはディレクトリのパス")
   .option("-o, --output <dir>", "出力ディレクトリ", "./output")
   .option("-t, --template <dir>", "カスタムテンプレートディレクトリ")
   .option("--no-index", "README.md の生成をスキップ")

@@ -7,7 +7,7 @@ import {
   mkdirSync,
   statSync,
 } from "fs";
-import { resolve, dirname, basename, join } from "path";
+import { resolve, dirname, basename, extname, join } from "path";
 import { fileURLToPath } from "url";
 import widdershins from "widdershins";
 import yaml from "js-yaml";
@@ -49,7 +49,7 @@ function extractEndpoints(spec) {
 }
 
 async function convertFile(file, inputDir, outputDir, templateDir) {
-  const name = basename(file, ".yaml");
+  const name = basename(file, extname(file));
   const filePath = inputDir ? join(inputDir, file) : file;
   const specText = readFileSync(filePath, "utf-8");
   const spec = yaml.load(specText);
@@ -131,7 +131,9 @@ export async function convert(input, opts = {}) {
   const indexEntries = [];
 
   if (stat.isDirectory()) {
-    const files = readdirSync(input).filter((f) => f.endsWith(".yaml"));
+    const files = readdirSync(input).filter(
+      (f) => f.endsWith(".yaml") || f.endsWith(".yml"),
+    );
     for (const file of files) {
       const entry = await convertFile(file, input, outputDir, templateDir);
       indexEntries.push(entry);
