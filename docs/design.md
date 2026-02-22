@@ -49,6 +49,8 @@ GitHub の Markdown レンダラーはセキュリティのため HTML をサニ
 | GitHub / VS Code（オンライン） | badgers.space バッジ（画像） |
 | バッジサービス障害時 / オフライン | alt テキスト（絵文字 + メソッド名） |
 
+バッジとテキストの垂直方向の高さが若干ずれる場合がある。HTML の `<img height="20">` で制御可能だが、Markdown 画像構文（`![alt](url)`）と異なりエディタプレビューでバッジも alt テキストも表示されなくなるため、Markdown 構文を採用している。GitHub がインライン画像に `style` 属性や `vertical-align` を許可しない制約上、現状では Markdown 構文側での解決手段がない。
+
 ### エンドポイントの折りたたみ
 
 `<details>` / `<summary>` タグで Swagger UI のアコーディオンを再現します。
