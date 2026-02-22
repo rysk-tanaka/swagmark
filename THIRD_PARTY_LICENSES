@@ -1,33 +1,15 @@
 ├─ commander@14.0.3
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/tj/commander.js
-│  ├─ publisher: TJ Holowaychuk
-│  ├─ email: tj@vision-media.ca
-│  ├─ path: /Users/rysk/Repositories/rysk/swagmark/node_modules/commander
-│  └─ licenseFile: /Users/rysk/Repositories/rysk/swagmark/node_modules/commander/LICENSE
+│  └─ publisher: TJ Holowaychuk
 ├─ js-yaml@4.1.1
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/nodeca/js-yaml
-│  ├─ publisher: Vladimir Zapparov
-│  ├─ email: dervus.grim@gmail.com
-│  ├─ path: /Users/rysk/Repositories/rysk/swagmark/node_modules/js-yaml
-│  └─ licenseFile: /Users/rysk/Repositories/rysk/swagmark/node_modules/js-yaml/LICENSE
-├─ prettier@3.8.1
-│  ├─ licenses: MIT
-│  ├─ repository: https://github.com/prettier/prettier
-│  ├─ publisher: James Long
-│  ├─ path: /Users/rysk/Repositories/rysk/swagmark/node_modules/prettier
-│  └─ licenseFile: /Users/rysk/Repositories/rysk/swagmark/node_modules/prettier/LICENSE
-├─ swagmark@0.1.0
-│  ├─ licenses: MIT
-│  ├─ path: /Users/rysk/Repositories/rysk/swagmark
-│  └─ licenseFile: /Users/rysk/Repositories/rysk/swagmark/LICENSE
+│  └─ publisher: Vladimir Zapparov
 └─ widdershins@4.0.1
    ├─ licenses: MIT
    ├─ repository: https://github.com/Mermade/widdershins
-   ├─ publisher: Mike Ralphson
-   ├─ path: /Users/rysk/Repositories/rysk/swagmark/node_modules/widdershins
-   └─ licenseFile: /Users/rysk/Repositories/rysk/swagmark/node_modules/widdershins/LICENSE
+   └─ publisher: Mike Ralphson
 
 ---
 

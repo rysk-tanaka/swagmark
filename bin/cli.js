@@ -1,6 +1,12 @@
 #!/usr/bin/env node
+import { readFileSync } from "fs";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
 import { program } from "commander";
 import { convert } from "../src/convert.mjs";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(resolve(__dirname, "../package.json"), "utf-8"));
 
 program
   .name("swagmark")
@@ -8,7 +14,7 @@ program
   .option("-o, --output <dir>", "出力ディレクトリ", "./output")
   .option("-t, --template <dir>", "カスタムテンプレートディレクトリ")
   .option("--no-index", "README.md の生成をスキップ")
-  .version("0.1.0")
+  .version(pkg.version)
   .action(async (input, opts) => {
     try {
       await convert(input, opts);
