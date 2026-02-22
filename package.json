@@ -34,6 +34,11 @@
     "js-yaml": "^4.1.1",
     "widdershins": "^4.0.1"
   },
+  "pnpm": {
+    "overrides": {
+      "markdown-it": "^14.1.0"
+    }
+  },
   "devDependencies": {
     "license-checker-rseidelsohn": "^4.4.2",
     "prettier": "^3.8.1"
