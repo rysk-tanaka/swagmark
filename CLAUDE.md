@@ -86,7 +86,7 @@ doT.js 構文を使用。`{{= }}` で出力、`{{? }}` で条件分岐、`{{~ }}
 
 - npm パッケージ: `npx swagmark` / `npm install swagmark`
 - GitHub Actions: `action.yml`（composite action）。`github.action_path` で自身の deps をインストールして CLI を実行
-- Docker: `Dockerfile`（マルチステージビルド、node:20-slim）。ENTRYPOINT が `bin/cli.js`
+- Docker: `Dockerfile`（マルチステージビルド、node:24-slim）。ENTRYPOINT が `bin/cli.js`
 
 ## ライセンス管理
 
