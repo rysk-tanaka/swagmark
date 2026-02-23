@@ -87,12 +87,14 @@ describe('<details>/<summary> 構造', () => {
 describe('curlサンプル生成', () => {
   test('GETリクエストに-dオプションが含まれない', () => {
     const getSection = validMd.match(/GET[\s\S]*?```shell([\s\S]*?)```/)
-    expect(getSection?.[1]).not.toContain(" -d '")
+    expect(getSection).not.toBeNull()
+    expect(getSection[1]).not.toContain(" -d '")
   })
 
   test('POSTリクエストにリクエストボディ(-d)が含まれる', () => {
     const postSection = validMd.match(/POST[\s\S]*?```shell([\s\S]*?)```/)
-    expect(postSection?.[1]).toContain(" -d '")
+    expect(postSection).not.toBeNull()
+    expect(postSection[1]).toContain(" -d '")
   })
 
   test('不要なwgetコメント行が出力に含まれない', () => {
