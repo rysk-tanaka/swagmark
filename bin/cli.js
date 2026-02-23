@@ -1,12 +1,14 @@
 #!/usr/bin/env node
-import { readFileSync } from "fs";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { program } from "commander";
 import { convert } from "../src/convert.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pkg = JSON.parse(readFileSync(resolve(__dirname, "../package.json"), "utf-8"));
+const pkg = JSON.parse(
+  readFileSync(resolve(__dirname, "../package.json"), "utf-8"),
+);
 
 program
   .name("swagmark")

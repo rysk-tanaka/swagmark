@@ -14,7 +14,10 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "update-licenses": "license-checker-rseidelsohn --production --excludePackages \"$npm_package_name@$npm_package_version\" --out THIRD_PARTY_LICENSES --limitAttributes licenses,repository,publisher && cat THIRD_PARTY_LICENSES.manual >> THIRD_PARTY_LICENSES",
-    "format": "prettier --write ."
+    "lint": "biome check .",
+    "lint:fix": "biome check --fix .",
+    "format": "biome format --write .",
+    "format:check": "biome format ."
   },
   "files": [
     "bin/",
@@ -48,9 +51,9 @@
     }
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.4",
     "@vitest/coverage-v8": "^4.0.0",
     "license-checker-rseidelsohn": "^4.4.2",
-    "prettier": "^3.8.1",
     "vitest": "^4.0.0"
   }
 }

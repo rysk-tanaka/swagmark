@@ -1,16 +1,16 @@
 // Convert OpenAPI YAML files using widdershins with custom Swagger-style templates
 
 import {
-  readFileSync,
-  writeFileSync,
-  readdirSync,
   mkdirSync,
+  readdirSync,
+  readFileSync,
   statSync,
-} from "fs";
-import { resolve, dirname, basename, extname, join } from "path";
-import { fileURLToPath } from "url";
-import widdershins from "widdershins";
+  writeFileSync,
+} from "node:fs";
+import { basename, dirname, extname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import yaml from "js-yaml";
+import widdershins from "widdershins";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -80,7 +80,7 @@ async function convertFile(file, inputDir, outputDir, templateDir) {
   // 3. Insert markdownlint suppression comment
   md = `<!-- markdownlint-disable MD024 MD028 MD036 -->\n${md}`;
 
-  md = md.trimEnd() + "\n";
+  md = `${md.trimEnd()}\n`;
   writeFileSync(join(outputDir, `${name}.md`), md);
   console.log(
     `widdershins-custom: ${name}.md (${md.split("\n").length} lines)`,
@@ -108,7 +108,7 @@ function generateIndex(entries, outputDir) {
     indexLines.push("");
   }
 
-  const indexContent = indexLines.join("\n").trimEnd() + "\n";
+  const indexContent = `${indexLines.join("\n").trimEnd()}\n`;
   writeFileSync(join(outputDir, "README.md"), indexContent);
   console.log(
     `README.md (${indexLines.length} lines, ${entries.length} sections)`,
