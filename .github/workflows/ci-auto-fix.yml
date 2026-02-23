@@ -1,0 +1,110 @@
+name: Auto Fix CI
+
+on:
+  workflow_run:
+    workflows: ["Test"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+  issues: write
+  id-token: write
+
+jobs:
+  auto-fix:
+    if: |
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.pull_requests[0] &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Check for previous auto-fix attempt
+        id: guard
+        run: |
+          AUTHOR=$(git log -1 --format='%an')
+          if [[ "$AUTHOR" == "github-actions[bot]" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup git identity
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Setup Node.js
+        if: steps.guard.outputs.skip != 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        if: steps.guard.outputs.skip != 'true'
+        run: corepack enable pnpm && pnpm install --frozen-lockfile
+
+      - name: Get CI failure details
+        if: steps.guard.outputs.skip != 'true'
+        id: failure
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: ${{ github.event.workflow_run.id }}
+            });
+            const failedJobs = jobs.data.jobs.filter(j => j.conclusion === 'failure');
+            const MAX_LOG_CHARS = 10000;
+            let errorLogs = [];
+            for (const job of failedJobs) {
+              const logs = await github.rest.actions.downloadJobLogsForWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                job_id: job.id
+              });
+              // @octokit/rest follows the 302 redirect and returns plain text in data
+              const fullLog = logs.data;
+              const truncated = fullLog.length > MAX_LOG_CHARS
+                ? '...(truncated)\n' + fullLog.slice(-MAX_LOG_CHARS)
+                : fullLog;
+              errorLogs.push({ jobName: job.name, logs: truncated });
+            }
+            return {
+              failedJobs: failedJobs.map(j => j.name),
+              errorLogs
+            };
+
+      - name: Fix CI failures with Claude
+        if: steps.guard.outputs.skip != 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: '--model claude-sonnet-4-6 --allowed-tools "Edit,Write,Read,Glob,Grep,Bash(git:*),Bash(pnpm:*),Bash(gh:*)"'
+          prompt: |
+            CI テストが失敗しました。エラーログを分析して修正し、このブランチにプッシュしてください。
+
+            PR: #${{ github.event.workflow_run.pull_requests[0].number }}
+            ブランチ: ${{ github.event.workflow_run.head_branch }}
+            失敗ジョブ: ${{ join(fromJSON(steps.failure.outputs.result).failedJobs, ', ') }}
+
+            エラーログ:
+            ${{ toJSON(fromJSON(steps.failure.outputs.result).errorLogs) }}
+
+            手順:
+            1. エラーの原因を特定する
+            2. `gh pr view` で PR の内容を確認し、変更の文脈を把握する
+            3. コードを修正する（スナップショット更新が必要な場合は `pnpm test -- -u` を実行）
+            4. `pnpm test` で修正を検証する
+            5. 変更をコミットして `git push origin HEAD:refs/heads/${{ github.event.workflow_run.head_branch }}` でプッシュする
+
+            コミットメッセージは英語で Conventional Commits 形式にしてください。
+            修正内容を PR にコメントしてください。
