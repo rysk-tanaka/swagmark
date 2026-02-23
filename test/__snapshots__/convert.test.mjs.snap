@@ -1,0 +1,350 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`スナップショット > サンプルOpenAPIからの出力がスナップショットと一致する 1`] = `
+"<!-- markdownlint-disable MD024 MD028 MD036 -->
+
+# Test Items API v1.0.0
+
+Base URLs:
+
+* <a href="https://api.example.com/v1">https://api.example.com/v1</a>
+
+## items
+
+<details>
+<summary>
+
+![🔵 GET](https://badgers.space/badge/_/GET/blue?label=&corner_radius=5) **\`/items\`** — List items
+
+</summary>
+
+\`\`\`shell
+curl -X GET https://api.example.com/v1/items \\
+  -H 'Accept: application/json'
+
+\`\`\`
+
+### Parameters
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|limit|query|integer|false|Maximum number of items to return|
+
+> Example responses
+
+> 200 Response
+
+\`\`\`json
+[
+  {
+    "id": 0,
+    "name": "string",
+    "description": "string"
+  }
+]
+\`\`\`
+
+### Responses
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|OK|A list of items|Inline|
+|default|Default|Unexpected error|[Error](#schemaerror)|
+
+### Response Schema
+
+Status Code **200**
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|*anonymous*|[[Item](#schemaitem)]|false|none|none|
+|» id|integer|true|none|none|
+|» name|string|true|none|none|
+|» description|string|false|none|none|
+
+</details>
+
+<details>
+<summary>
+
+![🟢 POST](https://badgers.space/badge/_/POST/green?label=&corner_radius=5) **\`/items\`** — Create item
+
+</summary>
+
+\`\`\`shell
+curl -X POST https://api.example.com/v1/items \\
+  -H 'Content-Type: application/json' \\
+  -H 'Accept: application/json' \\
+  -d '{"id":0,"name":"string","description":"string"}'
+
+\`\`\`
+
+> Body parameter
+
+\`\`\`json
+{
+  "id": 0,
+  "name": "string",
+  "description": "string"
+}
+\`\`\`
+
+### Parameters
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|body|body|[Item](#schemaitem)|true|none|
+|» id|body|integer|true|none|
+|» name|body|string|true|none|
+|» description|body|string|false|none|
+
+> Example responses
+
+> 201 Response
+
+\`\`\`json
+{
+  "id": 0,
+  "name": "string",
+  "description": "string"
+}
+\`\`\`
+
+### Responses
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|201|Created|Item created|[Item](#schemaitem)|
+|default|Default|Unexpected error|[Error](#schemaerror)|
+
+</details>
+
+<details>
+<summary>
+
+![🟠 PUT](https://badgers.space/badge/_/PUT/orange?label=&corner_radius=5) **\`/items/{id}\`** — Update item
+
+</summary>
+
+\`\`\`shell
+curl -X PUT https://api.example.com/v1/items/{id} \\
+  -H 'Content-Type: application/json' \\
+  -H 'Accept: application/json' \\
+  -d '{"id":0,"name":"string","description":"string"}'
+
+\`\`\`
+
+> Body parameter
+
+\`\`\`json
+{
+  "id": 0,
+  "name": "string",
+  "description": "string"
+}
+\`\`\`
+
+### Parameters
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|id|path|integer|true|Item ID|
+|body|body|[Item](#schemaitem)|true|none|
+|» id|body|integer|true|none|
+|» name|body|string|true|none|
+|» description|body|string|false|none|
+
+> Example responses
+
+> 200 Response
+
+\`\`\`json
+{
+  "id": 0,
+  "name": "string",
+  "description": "string"
+}
+\`\`\`
+
+### Responses
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|OK|Item updated|[Item](#schemaitem)|
+|default|Default|Unexpected error|[Error](#schemaerror)|
+
+</details>
+
+<details>
+<summary>
+
+![🔴 DELETE](https://badgers.space/badge/_/DELETE/red?label=&corner_radius=5) **\`/items/{id}\`** — Delete item
+
+</summary>
+
+\`\`\`shell
+curl -X DELETE https://api.example.com/v1/items/{id} \\
+  -H 'Accept: application/json'
+
+\`\`\`
+
+### Parameters
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|id|path|integer|true|Item ID|
+
+> Example responses
+
+> default Response
+
+\`\`\`json
+{
+  "code": 0,
+  "message": "string"
+}
+\`\`\`
+
+### Responses
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|204|No Content|Item deleted|None|
+|default|Default|Unexpected error|[Error](#schemaerror)|
+
+</details>
+
+<details>
+<summary>
+
+![🟣 PATCH](https://badgers.space/badge/_/PATCH/purple?label=&corner_radius=5) **\`/items/{id}\`** — Patch item
+
+</summary>
+
+\`\`\`shell
+curl -X PATCH https://api.example.com/v1/items/{id} \\
+  -H 'Content-Type: application/json' \\
+  -H 'Accept: application/json' \\
+  -d '{"name":"string","description":"string"}'
+
+\`\`\`
+
+> Body parameter
+
+\`\`\`json
+{
+  "name": "string",
+  "description": "string"
+}
+\`\`\`
+
+### Parameters
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|id|path|integer|true|Item ID|
+|body|body|[ItemPatch](#schemaitempatch)|true|none|
+|» name|body|string|false|none|
+|» description|body|string|false|none|
+
+> Example responses
+
+> 200 Response
+
+\`\`\`json
+{
+  "id": 0,
+  "name": "string",
+  "description": "string"
+}
+\`\`\`
+
+### Responses
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|OK|Item patched|[Item](#schemaitem)|
+|default|Default|Unexpected error|[Error](#schemaerror)|
+
+</details>
+
+## Schemas
+
+<a id="schemaitem"></a>
+<details>
+<summary>
+
+<strong>Item</strong>
+
+</summary>
+
+\`\`\`json
+{
+  "id": 0,
+  "name": "string",
+  "description": "string"
+}
+
+\`\`\`
+
+### Properties
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|id|integer|true|none|none|
+|name|string|true|none|none|
+|description|string|false|none|none|
+
+</details>
+
+<a id="schemaitempatch"></a>
+<details>
+<summary>
+
+<strong>ItemPatch</strong>
+
+</summary>
+
+\`\`\`json
+{
+  "name": "string",
+  "description": "string"
+}
+
+\`\`\`
+
+### Properties
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|name|string|false|none|none|
+|description|string|false|none|none|
+
+</details>
+
+<a id="schemaerror"></a>
+<details>
+<summary>
+
+<strong>Error</strong>
+
+</summary>
+
+\`\`\`json
+{
+  "code": 0,
+  "message": "string"
+}
+
+\`\`\`
+
+### Properties
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|code|integer|true|none|none|
+|message|string|true|none|none|
+
+</details>
+"
+`;
