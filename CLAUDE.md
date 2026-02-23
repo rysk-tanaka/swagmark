@@ -21,11 +21,29 @@ pnpm example
 # フォーマット
 pnpm format
 
+# テスト実行
+pnpm test
+
+# テスト（ウォッチモード）
+pnpm test:watch
+
+# 単一テストファイル実行
+pnpm test test/convert.test.mjs
+
+# 特定の describe/test のみ実行
+pnpm test -- -t "HTTPメソッドバッジ"
+
+# カバレッジ計測
+pnpm test:coverage
+
+# スナップショット更新（テンプレート変更後に必要）
+pnpm test -- -u
+
 # THIRD_PARTY_LICENSES 更新（license-checker + 手動分の結合）
 pnpm update-licenses
 ```
 
-テストフレームワークは未導入。
+テストフレームワーク: Vitest（`test/` ディレクトリ、フィクスチャは `test/fixtures/`）
 
 ## アーキテクチャ
 
@@ -42,7 +60,7 @@ bin/cli.js (commander で引数パース)
 ```
 
 - `bin/cli.js` — CLI エントリポイント。`package.json` からバージョンを動的読み込み。`convert()` の例外を try-catch で受けて `process.exit(1)` するのは CLI 側の責務
-- `src/convert.mjs` — 変換ロジック本体。`export async function convert(input, opts)` を公開。ライブラリとしても利用可能な設計のため、エラーは `throw` で伝播させる（`process.exit` 禁止）
+- `src/convert.mjs` — 変換ロジック本体。`export async function convert(input, opts)` を公開。ライブラリとしても利用可能な設計のため、エラーは `throw` で伝播させる（`process.exit` 禁止）。戻り値は `undefined`（結果はファイルに書き出す設計）。テストでは一時ディレクトリに出力後ファイルを読み込んで検証する
 - `templates/openapi3/` — widdershins の doT.js テンプレート群
   - `operation.dot` — エンドポイントを `<details>/<summary>` で囲み、badgers.space の HTTP メソッドバッジを付与
   - `code_shell.dot` — curl 例にリクエストボディ（`-d`）を自動付与
@@ -75,6 +93,7 @@ doT.js 構文を使用。`{{= }}` で出力、`{{? }}` で条件分岐、`{{~ }}
 
 ## CI/CD
 
+- `test.yml` — push / PR で `pnpm test` を自動実行
 - `auto-release.yml` — `package.json` の version 変更を検知し、以下を一連で実行
   - semver タグ（`v0.1.0`）と GitHub Release の自動作成（常に実行）
   - メジャーバージョンタグ (`v0`) の更新 — `vars.PUBLISH_ACTION == 'true'` で有効化

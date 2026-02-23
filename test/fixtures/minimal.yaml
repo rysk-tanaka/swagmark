@@ -1,0 +1,12 @@
+openapi: "3.0.0"
+info:
+  title: Minimal API
+  version: 0.1.0
+paths:
+  /hello:
+    get:
+      summary: Hello world
+      operationId: hello
+      responses:
+        '200':
+          description: OK

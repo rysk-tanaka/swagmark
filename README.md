@@ -3,6 +3,7 @@
 > OpenAPI YAML から GitHub プレビューで Swagger 風に見える Markdown を生成するツール
 
 [![release](https://github.com/rysk-tanaka/swagmark/actions/workflows/auto-release.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/auto-release.yml)
+[![test](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml)
 [![npm version](https://badgers.space/npm/version/swagmark?label=npm&corner_radius=5)](https://www.npmjs.com/package/swagmark)
 [![node](https://badgers.space/badge/node/%3E%3D18/5FA04E?corner_radius=5)](https://nodejs.org/)
 [![docker](https://badgers.space/badge/docker/ghcr.io/2496ED?corner_radius=5)](https://github.com/rysk-tanaka/swagmark/pkgs/container/swagmark)
@@ -170,7 +171,8 @@ docker run --rm \
 swagmark/
 ├── .github/
 │   └── workflows/
-│       └── auto-release.yml  # リリース + npm + Docker 自動公開
+│       ├── auto-release.yml  # リリース + npm + Docker 自動公開
+│       └── test.yml          # テスト自動実行
 ├── action.yml                # GitHub Actions 定義
 ├── docs/
 │   └── design.md             # 設計方針
@@ -186,6 +188,9 @@ swagmark/
 │       ├── operation.dot
 │       ├── code_shell.dot
 │       └── ...（widdershins デフォルトテンプレートからの派生）
+├── test/
+│   └── fixtures/             # テスト用 OpenAPI YAML
+├── vitest.config.mjs         # Vitest 設定
 ├── Dockerfile
 ├── package.json
 ├── LICENSE                   # MIT
