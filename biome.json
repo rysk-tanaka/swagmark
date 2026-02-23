@@ -3,13 +3,13 @@
   "files": {
     "includes": [
       "**",
-      "!.claude",
-      "!coverage",
-      "!output",
-      "!examples/petstore/output",
-      "!test/tmp",
-      "!test/tmp-cli",
-      "!templates",
+      "!!.claude",
+      "!!coverage",
+      "!!output",
+      "!!examples/petstore/output",
+      "!!test/tmp",
+      "!!test/tmp-cli",
+      "!!templates",
       "!THIRD_PARTY_LICENSES",
       "!pnpm-lock.yaml"
     ]

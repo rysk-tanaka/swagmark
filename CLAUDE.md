@@ -77,7 +77,7 @@ bin/cli.js (commander で引数パース)
 
 - Node.js >= 18, ESM (`"type": "module"`)
 - パッケージマネージャ: pnpm
-- リンター / フォーマッター: Biome
+- リンター / フォーマッター: Biome（`biome.json` の `!!` プレフィックスは Biome 2.x 公式の force-ignore 構文。スキャナーレベルでディレクトリを完全除外する。`!` とは異なる機能）
 - 主要依存: widdershins, commander, js-yaml
 - テンプレートエンジン: doT.js（widdershins 内蔵）
 - `pnpm.overrides` で `markdown-it` を `^14.1.0` に固定（widdershins の間接依存 `markdown-it@10` が Node.js 組み込み `punycode` を使用し非推奨警告が出るため）
