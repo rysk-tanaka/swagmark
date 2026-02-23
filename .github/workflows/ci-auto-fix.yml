@@ -55,7 +55,7 @@ jobs:
       - name: Get CI failure details
         if: steps.guard.outputs.skip != 'true'
         id: failure
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           RUN_ID: ${{ github.event.workflow_run.id }}
         with:
