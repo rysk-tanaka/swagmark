@@ -73,6 +73,7 @@ bin/cli.js (commander で引数パース)
 - パッケージマネージャ: pnpm
 - 主要依存: widdershins, commander, js-yaml
 - テンプレートエンジン: doT.js（widdershins 内蔵）
+- `pnpm.overrides` で `markdown-it` を `^14.1.0` に固定（widdershins の間接依存 `markdown-it@10` が Node.js 組み込み `punycode` を使用し非推奨警告が出るため）
 - GitHub Actions: actions/checkout@v6, actions/setup-node@v6（いずれも正式リリース済み）
 
 ## テンプレート編集時の注意
@@ -94,6 +95,7 @@ doT.js 構文を使用。`{{= }}` で出力、`{{? }}` で条件分岐、`{{~ }}
 ## CI/CD
 
 - `test.yml` — push / PR で `pnpm test` を自動実行
+- `claude-code-review.yml` — `claude-review` ラベル付き PR の自動コードレビュー（claude-code-action、オプトイン方式）
 - `auto-release.yml` — `package.json` の version 変更を検知し、以下を一連で実行
   - semver タグ（`v0.1.0`）と GitHub Release の自動作成（常に実行）
   - メジャーバージョンタグ (`v0`) の更新 — `vars.PUBLISH_ACTION == 'true'` で有効化
