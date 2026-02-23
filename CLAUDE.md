@@ -18,6 +18,12 @@ node bin/cli.js <input> -o <output-dir>
 # Petstore サンプルで動作確認
 pnpm example
 
+# lint（lint + format チェック一括実行）
+pnpm lint
+
+# lint 自動修正
+pnpm lint:fix
+
 # フォーマット
 pnpm format
 
@@ -71,6 +77,7 @@ bin/cli.js (commander で引数パース)
 
 - Node.js >= 18, ESM (`"type": "module"`)
 - パッケージマネージャ: pnpm
+- リンター / フォーマッター: Biome
 - 主要依存: widdershins, commander, js-yaml
 - テンプレートエンジン: doT.js（widdershins 内蔵）
 - `pnpm.overrides` で `markdown-it` を `^14.1.0` に固定（widdershins の間接依存 `markdown-it@10` が Node.js 組み込み `punycode` を使用し非推奨警告が出るため）
@@ -94,6 +101,7 @@ doT.js 構文を使用。`{{= }}` で出力、`{{? }}` で条件分岐、`{{~ }}
 
 ## CI/CD
 
+- `lint.yml` — push / PR で `biome check` を自動実行（`biomejs/setup-biome@v2` で `pnpm install` 不要）
 - `test.yml` — push / PR で `pnpm test` を自動実行
 - `ci-auto-fix.yml` — "Test" ワークフロー失敗時に Claude が自動修正して PR ブランチにプッシュ（再帰防止: 直前コミットが `github-actions[bot]` ならスキップ）
 - `claude-code-review.yml` — `claude-review` ラベル付き PR の自動コードレビュー（claude-code-action、オプトイン方式）
