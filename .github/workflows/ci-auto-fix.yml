@@ -5,12 +5,6 @@ on:
     workflows: ["Test"]
     types: [completed]
 
-permissions:
-  contents: write
-  pull-requests: write
-  actions: read
-  issues: write
-
 jobs:
   auto-fix:
     if: |
@@ -19,8 +13,14 @@ jobs:
       github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      actions: read
+      id-token: write
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v6
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
@@ -91,7 +91,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: '--model claude-sonnet-4-6 --allowed-tools "Edit,Write,Read,Glob,Grep,Bash(git:*),Bash(pnpm:*),Bash(gh pr comment:*),Bash(gh pr view:*)"'
+          claude_args: '--model claude-sonnet-4-6 --allowed-tools "Edit,Write,Read,Glob,Grep,Bash(git *),Bash(pnpm *),Bash(gh pr comment *),Bash(gh pr view *)"'
           prompt: |
             CI テストが失敗しました。エラーログを分析して修正し、このブランチにプッシュしてください。
 
@@ -111,3 +111,6 @@ jobs:
 
             コミットメッセージは英語で Conventional Commits 形式にしてください。
             修正内容を PR にコメントしてください。
+
+            ---
+            🤖 モデル: [実際のモデル名] / 💰 コスト: 入力[N]トークン, 出力[M]トークン, $[金額]

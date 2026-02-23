@@ -97,6 +97,7 @@ doT.js 構文を使用。`{{= }}` で出力、`{{? }}` で条件分岐、`{{~ }}
 - `test.yml` — push / PR で `pnpm test` を自動実行
 - `ci-auto-fix.yml` — "Test" ワークフロー失敗時に Claude が自動修正して PR ブランチにプッシュ（再帰防止: 直前コミットが `github-actions[bot]` ならスキップ）
 - `claude-code-review.yml` — `claude-review` ラベル付き PR の自動コードレビュー（claude-code-action、オプトイン方式）
+- claude-code-action を使うワークフローには `id-token: write` 権限が必須。`github_token` を明示指定しない場合、アクションは OIDC トークンを取得して Claude GitHub App のインストールトークンに交換する。`GITHUB_TOKEN` へのフォールバックはないため、この権限がないとアクション全体が失敗する
 - `auto-release.yml` — `package.json` の version 変更を検知し、以下を一連で実行
   - semver タグ（`v0.1.0`）と GitHub Release の自動作成（常に実行）
   - メジャーバージョンタグ (`v0`) の更新 — `vars.PUBLISH_ACTION == 'true'` で有効化
