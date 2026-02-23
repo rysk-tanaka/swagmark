@@ -21,11 +21,20 @@ pnpm example
 # フォーマット
 pnpm format
 
+# テスト実行
+pnpm test
+
+# テスト（ウォッチモード）
+pnpm test:watch
+
+# カバレッジ計測
+pnpm test:coverage
+
 # THIRD_PARTY_LICENSES 更新（license-checker + 手動分の結合）
 pnpm update-licenses
 ```
 
-テストフレームワークは未導入。
+テストフレームワーク: Vitest（`test/` ディレクトリ、フィクスチャは `test/fixtures/`）
 
 ## アーキテクチャ
 

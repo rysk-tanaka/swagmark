@@ -1,0 +1,175 @@
+openapi: "3.0.0"
+info:
+  title: Test Items API
+  version: 1.0.0
+servers:
+  - url: https://api.example.com/v1
+paths:
+  /items:
+    get:
+      summary: List items
+      operationId: listItems
+      tags:
+        - items
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of items to return
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+      responses:
+        '200':
+          description: A list of items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create item
+      operationId: createItem
+      tags:
+        - items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '201':
+          description: Item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /items/{id}:
+    put:
+      summary: Update item
+      operationId: updateItem
+      tags:
+        - items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Item ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '200':
+          description: Item updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete item
+      operationId: deleteItem
+      tags:
+        - items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Item ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Item deleted
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      summary: Patch item
+      operationId: patchItem
+      tags:
+        - items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Item ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemPatch'
+      responses:
+        '200':
+          description: Item patched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Item:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+    ItemPatch:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
