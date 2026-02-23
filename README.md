@@ -22,7 +22,7 @@ swagmark は [widdershins](https://github.com/Mermade/widdershins) のカスタ�
 
 生成された Markdown は GitHub や VS Code でそのままプレビュー可能です。Swagger UI の完全再現ではなく、Markdown の制約内で最大限 Swagger 風の見た目を実現することを目的としています。
 
-> バッジ画像は [badgers.space](https://badgers.space/)（MIT License）を利用しています。サービス障害時は alt テキスト（例: 🔵 GET）が自動的に表示されます。
+> バッジ画像は [badgers.space](https://badgers.space/) を利用しています。サービス障害時は alt テキスト（例: 🔵 GET）が自動的に表示されます。
 
 ---
 
@@ -66,7 +66,7 @@ curl -X POST http://petstore.swagger.io/v1/pets \
 
 ## インストール・実行
 
-### npx（インストール不要）
+### npx
 
 ```bash
 npx swagmark input.yaml -o docs/
