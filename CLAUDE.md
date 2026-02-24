@@ -18,11 +18,14 @@ node bin/cli.js <input> -o <output-dir>
 # Petstore サンプルで動作確認
 pnpm example
 
-# lint（lint + format チェック一括実行）
+# lint（Biome + markdownlint 一括実行）
 pnpm lint
 
 # lint 自動修正
 pnpm lint:fix
+
+# Markdown のみ lint
+pnpm lint:md
 
 # フォーマット
 pnpm format
@@ -76,7 +79,7 @@ bin/cli.js (commander で引数パース)
 
 ## 技術スタック
 
-- Node.js >= 18, ESM (`"type": "module"`)
+- Node.js >= 20, ESM (`"type": "module"`)
 - パッケージマネージャ: pnpm
 - リンター / フォーマッター: Biome（`biome.json` の `!!` プレフィックスは Biome 2.x 公式の force-ignore 構文。スキャナーレベルでディレクトリを完全除外する。`!` とは異なる機能）
   - JS スタイル: ダブルクォート、セミコロン必須、trailing comma あり、インデント 2 スペース、行幅 80
