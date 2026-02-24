@@ -1,0 +1,114 @@
+name: Dependabot Alert Scan
+
+on:
+  dependabot_alert:
+    types:
+      [created, reintroduced, auto_reopened, fixed, dismissed, auto_dismissed]
+
+jobs:
+  analyze:
+    if: >-
+      github.event.action == 'created' ||
+      github.event.action == 'reintroduced' ||
+      github.event.action == 'auto_reopened'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Enable pnpm via corepack
+        run: corepack enable pnpm
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Analyze alert with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: '--model claude-sonnet-4-6 --max-turns 5 --allowed-tools "Read,Bash(pnpm why *),Bash(pnpm ls *),Bash(gh issue *),Bash(gh label *)"'
+          prompt: |
+            Dependabot がセキュリティアラートを検出しました。分析して GitHub Issue を作成してください。
+
+            ## アラート情報
+
+            - パッケージ: ${{ github.event.alert.security_vulnerability.package.name }}
+            - 深刻度: ${{ github.event.alert.security_advisory.severity }}
+            - 概要: ${{ github.event.alert.security_advisory.summary }}
+            - GHSA: ${{ github.event.alert.security_advisory.ghsa_id }}
+            - 影響範囲: ${{ github.event.alert.security_vulnerability.vulnerable_version_range }}
+            - 修正バージョン: ${{ github.event.alert.security_vulnerability.first_patched_version.identifier }}
+            - スコープ: ${{ github.event.alert.dependency.scope }}
+            - アラート URL: ${{ github.event.alert.html_url }}
+
+            ## 分析手順
+
+            1. `pnpm why ${{ github.event.alert.security_vulnerability.package.name }}` で依存チェーンを確認（直接依存 or 間接依存）
+            2. `renovate.json` を読んで Renovate の設定を確認（自動更新対象かどうか）
+            3. `package.json` の `pnpm.overrides` を確認（既に対応済みかどうか）
+            4. 修正方法を判断して提案
+
+            ## Issue 作成ルール
+
+            - タイトル: `security(deps): ${{ github.event.alert.security_vulnerability.package.name }} — ${{ github.event.alert.security_advisory.severity }} (${{ github.event.alert.security_advisory.ghsa_id }})`
+            - ラベル: `security`, `dependencies`
+              - ラベルが存在しない場合は `gh label create` で作成してから使用
+            - 同じタイトルの Issue が既に存在する場合は作成しない（`gh issue list` で事前確認）
+            - 本文は日本語で記述（パッケージ名・技術用語は英語のまま）
+            - 本文に含める内容
+              1. アラート概要（深刻度、脆弱性の説明、アラート URL へのリンク）
+              2. 依存チェーン（`pnpm why` の結果を `<details>` で折りたたみ）
+              3. Renovate 対応状況（自動更新対象か、除外されているか）
+              4. 推奨対応
+                 - Renovate で自動修正可能 → その旨を記載
+                 - `pnpm.overrides` が必要 → 具体的なエントリを JSON で提示
+                 - 手動更新が必要 → 手順を記載
+
+  close:
+    if: >-
+      github.event.action == 'fixed' ||
+      github.event.action == 'dismissed' ||
+      github.event.action == 'auto_dismissed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+
+    steps:
+      - name: Close resolved tracking issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHSA_ID: ${{ github.event.alert.security_advisory.ghsa_id }}
+        run: |
+          ISSUE_NUMBERS=$(gh issue list \
+            --repo "$GITHUB_REPOSITORY" \
+            --label security \
+            --state open \
+            --json number,title \
+            --jq ".[] | select(.title | contains(\"$GHSA_ID\")) | .number")
+
+          if [ -z "$ISSUE_NUMBERS" ]; then
+            echo "No open tracking issue found for $GHSA_ID"
+            exit 0
+          fi
+
+          for num in $ISSUE_NUMBERS; do
+            gh issue close "$num" \
+              --repo "$GITHUB_REPOSITORY" \
+              --comment "Dependabot アラート ($GHSA_ID) が解消されました。この Issue を自動クローズします。"
+            echo "Closed issue #$num"
+          done
