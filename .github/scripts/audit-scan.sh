@@ -20,7 +20,7 @@ if [[ -f "$RENOVATE_FILE" ]]; then
   RENOVATE_EXCLUDED=$(jq -r '
     .packageRules[]
     | select(.enabled == false)
-    | .matchDepNames[]
+    | .matchDepNames[]?
   ' "$RENOVATE_FILE" 2>/dev/null || true)
 fi
 
