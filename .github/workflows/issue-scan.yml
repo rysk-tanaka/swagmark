@@ -29,4 +29,4 @@ jobs:
             List all open issues in this repository using `gh issue list --state open`.
             Output the issue number, title, and labels for each.
             This is a read-only verification run — do not modify anything.
-          claude_args: "--max-turns 1 --model claude-sonnet-4-6 --allowed-tools 'Bash(gh issue list *)'"
+          claude_args: "--max-turns 2 --model claude-sonnet-4-6 --allowed-tools 'Bash(gh issue list *)'"
