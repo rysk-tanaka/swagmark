@@ -79,6 +79,10 @@ else
       echo "Skipping advisory $key (no GHSA ID)"
       continue
     fi
+    # These fields are always present in pnpm audit advisories (verified with
+    # pnpm v10). The // empty fallbacks are purely defensive; if patched_versions
+    # were empty, the recommendation text would be incomplete but the Issue would
+    # still be created with the Advisory URL for reference.
     url=$(jq -r --arg k "$key" '.advisories[$k].url // empty' "$AUDIT_FILE")
     title_text=$(jq -r --arg k "$key" '.advisories[$k].title // empty' "$AUDIT_FILE")
     vulnerable_versions=$(jq -r --arg k "$key" '.advisories[$k].vulnerable_versions // empty' "$AUDIT_FILE")
