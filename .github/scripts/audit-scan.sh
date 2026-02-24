@@ -42,7 +42,7 @@ has_override() {
 # ---------------------------------------------------------------------------
 ensure_label() {
   local name="$1" color="$2" description="$3"
-  if ! gh label list --limit 100 | grep -qw "$name"; then
+  if ! gh label list --limit 500 --json name --jq '.[].name' | grep -qxF "$name"; then
     gh label create "$name" --color "$color" --description "$description"
     echo "Created label: $name"
   fi
@@ -67,10 +67,15 @@ fi
 if [[ -z "$ADVISORY_KEYS" ]]; then
   echo "No advisories found."
 else
-  for key in $ADVISORY_KEYS; do
-    module_name=$(jq -r --arg k "$key" '.advisories[$k].module_name' "$AUDIT_FILE")
-    severity=$(jq -r --arg k "$key" '.advisories[$k].severity' "$AUDIT_FILE")
-    ghsa_id=$(jq -r --arg k "$key" '.advisories[$k].github_advisory_id' "$AUDIT_FILE")
+  while IFS= read -r key; do
+    [[ -z "$key" ]] && continue
+    module_name=$(jq -r --arg k "$key" '.advisories[$k].module_name // "unknown"' "$AUDIT_FILE")
+    severity=$(jq -r --arg k "$key" '.advisories[$k].severity // "unknown"' "$AUDIT_FILE")
+    ghsa_id=$(jq -r --arg k "$key" '.advisories[$k].github_advisory_id // empty' "$AUDIT_FILE")
+    if [[ -z "$ghsa_id" ]]; then
+      echo "Skipping advisory $key (no GHSA ID)"
+      continue
+    fi
     url=$(jq -r --arg k "$key" '.advisories[$k].url' "$AUDIT_FILE")
     title_text=$(jq -r --arg k "$key" '.advisories[$k].title' "$AUDIT_FILE")
     vulnerable_versions=$(jq -r --arg k "$key" '.advisories[$k].vulnerable_versions' "$AUDIT_FILE")
@@ -175,7 +180,7 @@ EOF
       --label "dependencies"
 
     echo "Created issue: $issue_title"
-  done
+  done <<< "$ADVISORY_KEYS"
 fi
 
 # ---------------------------------------------------------------------------
@@ -184,7 +189,7 @@ fi
 echo ""
 echo "Checking for resolved issues to close..."
 
-open_issues=$(gh issue list --label security --label dependencies --state open --json number,title --jq '.[] | "\(.number)\t\(.title)"')
+open_issues=$(gh issue list --label security --label dependencies --state open --limit 500 --json number,title --jq '.[] | "\(.number)\t\(.title)"')
 
 if [[ -z "$open_issues" ]]; then
   echo "No open security issues found."
