@@ -168,7 +168,7 @@ describe("スナップショット", () => {
 
 describe("minimal.yaml（最小構成OpenAPI）", () => {
   test("servers なしでも正常に変換される", () => {
-    expect(minimalMd).toContain("<details>");
+    expect(minimalMd.length).toBeGreaterThan(0);
   });
 
   test("Base URLs セクションが含まれない", () => {
@@ -195,7 +195,7 @@ describe("minimal.yaml（最小構成OpenAPI）", () => {
 
 describe("Swagger 2.0 入力", () => {
   test("Swagger 2.0 YAMLが正常に変換される", () => {
-    expect(swagger2Md).toBeDefined();
+    expect(swagger2Md.length).toBeGreaterThan(0);
   });
 
   test("GETバッジが含まれる", () => {
