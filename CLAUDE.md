@@ -87,6 +87,7 @@ bin/cli.js (commander で引数パース)
 - テンプレートエンジン: doT.js（widdershins 内蔵）
 - `pnpm.overrides` で `markdown-it` を `^14.1.0` に固定（widdershins の間接依存 `markdown-it@10` が Node.js 組み込み `punycode` を使用し非推奨警告が出るため）
 - GitHub Actions: actions/checkout@v6, actions/setup-node@v6（いずれも正式リリース済み）
+  - pnpm キャッシュを使う場合、`corepack enable pnpm` を `actions/setup-node`（`cache: pnpm`）より前に実行する必要がある
 
 ## テンプレート編集時の注意
 
@@ -106,9 +107,16 @@ doT.js 構文を使用。`{{= }}` で出力、`{{? }}` で条件分岐、`{{~ }}
    - MD033（インライン HTML）は `<details>/<summary>` や `<a>` タグの使用が必須
    - MD036（強調のみの行）は widdershins が生成するスキーマ見出し等で発生
 
+markdownlint 抑制は二層構造で運用している。
+
+- `.markdownlint-cli2.jsonc`（グローバル設定）— 本プロジェクトの開発者向けポリシー
+- インライン抑制コメント（`convertFile()` で自動挿入）— `convert()` の出力先で markdownlint を実行するユーザー向け（`.markdownlint-cli2.jsonc` がない環境）
+
+グローバル設定とインライン抑制でルールが重複するのは意図的な設計であり、冗長ではない。
+
 ## CI/CD
 
-- `lint.yml` — push / PR で `biome check` を自動実行（`biomejs/setup-biome@v2` で `pnpm install` 不要）
+- `lint.yml` — push / PR で Biome（`biomejs/setup-biome@v2` で `pnpm install` 不要）と markdownlint（`lint-md` ジョブ）を自動実行
 - `test.yml` — push / PR で `pnpm test` を自動実行
 - `ci-auto-fix.yml` — "Test" ワークフロー失敗時に Claude が自動修正して PR ブランチにプッシュ（再帰防止: 直前コミットが `github-actions[bot]` ならスキップ）
 - `claude-code-review.yml` — `claude-review` ラベル付き PR の自動コードレビュー（claude-code-action、オプトイン方式）
