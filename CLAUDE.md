@@ -18,11 +18,14 @@ node bin/cli.js <input> -o <output-dir>
 # Petstore サンプルで動作確認
 pnpm example
 
-# lint（lint + format チェック一括実行）
+# lint（Biome + markdownlint 一括実行）
 pnpm lint
 
 # lint 自動修正
 pnpm lint:fix
+
+# Markdown のみ lint
+pnpm lint:md
 
 # フォーマット
 pnpm format
@@ -76,7 +79,7 @@ bin/cli.js (commander で引数パース)
 
 ## 技術スタック
 
-- Node.js >= 18, ESM (`"type": "module"`)
+- Node.js >= 20, ESM (`"type": "module"`)
 - パッケージマネージャ: pnpm
 - リンター / フォーマッター: Biome（`biome.json` の `!!` プレフィックスは Biome 2.x 公式の force-ignore 構文。スキャナーレベルでディレクトリを完全除外する。`!` とは異なる機能）
   - JS スタイル: ダブルクォート、セミコロン必須、trailing comma あり、インデント 2 スペース、行幅 80
@@ -97,9 +100,10 @@ doT.js 構文を使用。`{{= }}` で出力、`{{? }}` で条件分岐、`{{~ }}
 
 1. RFC リンク除去 — `[text](https://tools.ietf.org/...)` → `text`
 2. widdershins generator コメント除去
-3. markdownlint 抑制コメント挿入 — `<!-- markdownlint-disable MD024 MD028 MD036 -->`
+3. markdownlint 抑制コメント挿入 — `<!-- markdownlint-disable MD024 MD028 MD033 MD036 -->`
    - MD024（重複見出し）は `<details>` 内のエンドポイント毎に同じ見出し（Parameters, Responses）が繰り返されるため不可避
    - MD028（blockquote 内の空行）は widdershins 内部生成によるもので制御不可
+   - MD033（インライン HTML）は `<details>/<summary>` や `<a>` タグの使用が必須
    - MD036（強調のみの行）は widdershins が生成するスキーマ見出し等で発生
 
 ## CI/CD

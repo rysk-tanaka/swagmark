@@ -5,7 +5,7 @@
 [![release](https://github.com/rysk-tanaka/swagmark/actions/workflows/auto-release.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/auto-release.yml)
 [![test](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml)
 [![npm version](https://badgers.space/npm/version/swagmark?label=npm&corner_radius=5)](https://www.npmjs.com/package/swagmark)
-[![node](https://badgers.space/badge/node/%3E%3D18/5FA04E?corner_radius=5)](https://nodejs.org/)
+[![node](https://badgers.space/badge/node/%3E%3D20/5FA04E?corner_radius=5)](https://nodejs.org/)
 [![docker](https://badgers.space/badge/docker/ghcr.io/2496ED?corner_radius=5)](https://github.com/rysk-tanaka/swagmark/pkgs/container/swagmark)
 [![license](https://badgers.space/github/license/rysk-tanaka/swagmark?corner_radius=5)](./LICENSE)
 

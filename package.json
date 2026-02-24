@@ -14,8 +14,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "update-licenses": "license-checker-rseidelsohn --production --excludePackages \"$npm_package_name@$npm_package_version\" --out THIRD_PARTY_LICENSES --limitAttributes licenses,repository,publisher && cat THIRD_PARTY_LICENSES.manual >> THIRD_PARTY_LICENSES",
-    "lint": "biome check .",
-    "lint:fix": "biome check --fix .",
+    "lint": "biome check . && markdownlint-cli2",
+    "lint:fix": "biome check --fix . && markdownlint-cli2 --fix",
+    "lint:md": "markdownlint-cli2",
     "format": "biome format --write .",
     "format:check": "biome format ."
   },
@@ -38,7 +39,7 @@
   },
   "packageManager": "pnpm@10.30.2",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "dependencies": {
     "commander": "^14.0.3",
@@ -54,6 +55,7 @@
     "@biomejs/biome": "^2.4.4",
     "@vitest/coverage-v8": "^4.0.0",
     "license-checker-rseidelsohn": "^4.4.2",
+    "markdownlint-cli2": "^0.21.0",
     "vitest": "^4.0.0"
   }
 }

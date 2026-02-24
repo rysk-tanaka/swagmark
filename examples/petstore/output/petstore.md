@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD024 MD028 MD036 -->
+<!-- markdownlint-disable MD024 MD028 MD033 MD036 -->
 
 # Swagger Petstore v1.0.0
 
