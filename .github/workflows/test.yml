@@ -14,5 +14,6 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
+          cache: pnpm
       - run: corepack enable pnpm && pnpm install --frozen-lockfile
       - run: pnpm test
