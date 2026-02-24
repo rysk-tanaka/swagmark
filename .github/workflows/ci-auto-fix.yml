@@ -40,6 +40,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Enable pnpm via corepack
+        if: steps.guard.outputs.skip != 'true'
+        run: corepack enable pnpm
+
       - name: Setup Node.js
         if: steps.guard.outputs.skip != 'true'
         uses: actions/setup-node@v6
@@ -49,9 +53,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.guard.outputs.skip != 'true'
-        run: |
-          corepack enable pnpm
-          pnpm install --frozen-lockfile || pnpm install
+        run: pnpm install --frozen-lockfile || pnpm install
 
       - name: Get CI failure details
         if: steps.guard.outputs.skip != 'true'

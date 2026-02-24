@@ -23,9 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - run: corepack enable pnpm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: pnpm
-      - run: corepack enable pnpm && pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
       - run: pnpm lint:md
