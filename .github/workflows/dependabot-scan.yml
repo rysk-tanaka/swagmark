@@ -116,6 +116,7 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --label security \
             --state open \
+            --limit 500 \
             --json number,title \
             | jq -r --arg id "$GHSA_ID" '.[] | select(.title | contains($id)) | .number')
 
