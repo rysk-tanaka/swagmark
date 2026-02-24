@@ -25,7 +25,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          direct_prompt: |
+          prompt: |
             List all open issues in this repository using `gh issue list --state open`.
             Output the issue number, title, and labels for each.
             This is a read-only verification run — do not modify anything.
