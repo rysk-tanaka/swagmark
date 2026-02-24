@@ -121,7 +121,7 @@ markdownlint 抑制は二層構造で運用している。
 - `ci-auto-fix.yml` — "Test" ワークフロー失敗時に Claude が自動修正して PR ブランチにプッシュ（再帰防止: 直前コミットが `github-actions[bot]` ならスキップ）
 - `claude-code-review.yml` — `claude-review` ラベル付き PR の自動コードレビュー（claude-code-action、オプトイン方式）
 - `issue-scan.yml` — 週次 cron（日曜 UTC 0:00）+ `workflow_dispatch` で open issue をトリアージ。claude-haiku-4-5 で難易度判定（easy/medium/hard）し、ラベル付与とコメントを行う。easy は `claude-implement` ラベルで自動実装ワークフローに連携予定
-- `dependabot-scan.yml` — Dependabot アラート発生時に Claude が依存チェーンを分析し、対応方針（`pnpm.overrides` 追加等）を Issue に起票。アラート解消時は自動クローズ
+- `dependabot-scan.yml` — `workflow_dispatch` で手動実行。`pnpm audit` で脆弱性を検出し、シェルスクリプトが依存チェーンを分析して対応方針（`pnpm.overrides` 追加等）を Issue に起票。解消済み Issue は自動クローズ
 - claude-code-action を使うワークフローには `id-token: write` 権限が必須。`github_token` を明示指定しない場合、アクションは OIDC トークンを取得して Claude GitHub App のインストールトークンに交換する。`GITHUB_TOKEN` へのフォールバックはないため、この権限がないとアクション全体が失敗する
 - `auto-release.yml` — `package.json` の version 変更を検知し、以下を一連で実行
   - semver タグ（`v0.1.0`）と GitHub Release の自動作成（常に実行）
