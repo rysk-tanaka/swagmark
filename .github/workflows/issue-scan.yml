@@ -28,7 +28,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: '--max-turns 3 --model claude-haiku-4-5 --allowed-tools "Bash(gh issue *),Bash(gh label create *)"'
+          claude_args: '--max-turns 3 --model claude-haiku-4-5 --allowed-tools "Bash(gh issue list *),Bash(gh issue view *),Bash(gh issue comment *),Bash(gh issue edit *),Bash(gh label *)"'
           prompt: |
             あなたは Issue トリアージ担当です。以下の手順に従ってください。
 
@@ -61,6 +61,3 @@ jobs:
 
             - ラベル付与とコメント以外の変更は行わないでください
             - 対象 issue が0件の場合は何もせず終了してください
-
-            ---
-            🤖 モデル: [実際のモデル名] / 💰 コスト: 入力[N]トークン, 出力[M]トークン, $[金額]
