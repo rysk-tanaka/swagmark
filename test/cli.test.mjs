@@ -21,7 +21,7 @@ describe("CLIオプション", () => {
 
   test("-o オプションで出力ディレクトリが指定できる", () => {
     const outDir = `${CLI_TMP}/output`;
-    execSync(`node bin/cli.js test/fixtures/valid.yaml -o ${outDir}`, {
+    execSync(`node bin/cli.js test/fixtures/valid.yaml -o "${outDir}"`, {
       stdio: "pipe",
     });
     expect(existsSync(outDir)).toBe(true);
@@ -34,7 +34,7 @@ describe("CLIオプション", () => {
   test("--no-index オプションで README.md が生成されない", () => {
     const outDir = `${CLI_TMP}/no-index`;
     execSync(
-      `node bin/cli.js test/fixtures/valid.yaml -o ${outDir} --no-index`,
+      `node bin/cli.js test/fixtures/valid.yaml -o "${outDir}" --no-index`,
       { stdio: "pipe" },
     );
     expect(existsSync(`${outDir}/README.md`)).toBe(false);
@@ -43,7 +43,7 @@ describe("CLIオプション", () => {
 
   test("ディレクトリ入力で複数ファイルが一括変換される", () => {
     const outDir = `${CLI_TMP}/dir-output`;
-    execSync(`node bin/cli.js test/fixtures/dir -o ${outDir}`, {
+    execSync(`node bin/cli.js test/fixtures/dir -o "${outDir}"`, {
       stdio: "pipe",
     });
     expect(existsSync(`${outDir}/api-a.md`)).toBe(true);

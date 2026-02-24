@@ -168,7 +168,7 @@ describe("スナップショット", () => {
 
 describe("minimal.yaml（最小構成OpenAPI）", () => {
   test("servers なしでも正常に変換される", () => {
-    expect(minimalMd).toBeDefined();
+    expect(minimalMd).toContain("<details>");
   });
 
   test("Base URLs セクションが含まれない", () => {
@@ -227,6 +227,7 @@ describe("ディレクトリ入力（一括変換）", () => {
     await convert("test/fixtures/dir", { output: DIR_OUT, index: false });
     expect(existsSync(join(DIR_OUT, "api-a.md"))).toBe(true);
     expect(existsSync(join(DIR_OUT, "api-b.md"))).toBe(true);
+    expect(existsSync(join(DIR_OUT, "README.md"))).toBe(false);
   });
 
   test("index: true のとき README.md が生成される", async () => {
