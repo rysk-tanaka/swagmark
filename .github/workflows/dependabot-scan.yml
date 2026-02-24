@@ -48,7 +48,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: '--model claude-sonnet-4-6 --max-turns 10 --allowed-tools "Read,Bash(pnpm why *),Bash(pnpm ls *),Bash(gh issue list *),Bash(gh issue create *),Bash(gh label list *),Bash(gh label create *)"'
+          claude_args: '--model claude-sonnet-4-6 --max-turns 10 --allowed-tools "Read,Bash(pnpm why *),Bash(pnpm ls *),Bash(gh issue list *),Bash(gh issue create *),Bash(gh issue close *),Bash(gh label list *),Bash(gh label create *)"'
           prompt: |
             `pnpm audit` の結果を分析し、検出された脆弱性ごとに GitHub Issue を作成してください。
 
@@ -67,8 +67,8 @@ jobs:
 
             ## Issue 作成ルール
 
-            - タイトル: `security(deps): <package>@<vulnerable-version> — <severity>`
-              - 同一パッケージ・同一 severity でも脆弱性ごとに一意になるようバージョン範囲を含める
+            - タイトル: `security(deps): <package> — <severity> (<ghsa_id>)`
+              - `ghsa_id` は `audit-result.json` の各アドバイザリの `github_advisory_id` フィールドから取得
             - ラベル: `security`, `dependencies`
               - ラベルが存在しない場合は `gh label create` で作成してから使用
             - 同じタイトルの Issue が既に存在する場合は作成しない（`gh issue list` で事前確認）
@@ -81,3 +81,9 @@ jobs:
                  - Renovate で自動修正可能 → その旨を記載
                  - `pnpm.overrides` が必要 → 具体的なエントリを JSON で提示
                  - 手動更新が必要 → 手順を記載
+
+            ## 解消済み Issue のクローズ
+
+            分析完了後、`security` ラベル付きの open Issue を `gh issue list` で取得し、
+            `audit-result.json` に該当するアドバイザリが含まれていない Issue はクローズする。
+            クローズ時のコメント: `pnpm audit で検出されなくなったため、この Issue をクローズします。`
