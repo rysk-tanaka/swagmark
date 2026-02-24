@@ -79,10 +79,10 @@ else
       echo "Skipping advisory $key (no GHSA ID)"
       continue
     fi
-    url=$(jq -r --arg k "$key" '.advisories[$k].url' "$AUDIT_FILE")
-    title_text=$(jq -r --arg k "$key" '.advisories[$k].title' "$AUDIT_FILE")
-    vulnerable_versions=$(jq -r --arg k "$key" '.advisories[$k].vulnerable_versions' "$AUDIT_FILE")
-    patched_versions=$(jq -r --arg k "$key" '.advisories[$k].patched_versions' "$AUDIT_FILE")
+    url=$(jq -r --arg k "$key" '.advisories[$k].url // empty' "$AUDIT_FILE")
+    title_text=$(jq -r --arg k "$key" '.advisories[$k].title // empty' "$AUDIT_FILE")
+    vulnerable_versions=$(jq -r --arg k "$key" '.advisories[$k].vulnerable_versions // empty' "$AUDIT_FILE")
+    patched_versions=$(jq -r --arg k "$key" '.advisories[$k].patched_versions // empty' "$AUDIT_FILE")
 
     # Dependency chains from findings[].paths
     dep_paths=$(jq -r --arg k "$key" '
