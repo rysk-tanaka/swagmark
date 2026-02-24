@@ -35,6 +35,9 @@ jobs:
       - name: Run pnpm audit
         run: pnpm audit --json > audit-result.json || true
 
+      # pnpm audit --json outputs the npm v6 advisory format (.advisories key)
+      # as of pnpm v10. Verified locally; if a future pnpm version switches to
+      # auditReportVersion 2 (.vulnerabilities key), this check will catch it.
       - name: Verify audit output
         run: |
           if ! jq -e '.advisories' audit-result.json > /dev/null 2>&1; then

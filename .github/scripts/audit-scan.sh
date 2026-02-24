@@ -53,6 +53,9 @@ ensure_label "dependencies" "0075ca" "Dependency updates"
 
 # ---------------------------------------------------------------------------
 # Collect advisory GHSA IDs from audit result
+# pnpm audit --json uses the npm v6 advisory format (.advisories key) as of
+# pnpm v10. The workflow's "Verify audit output" step will fail fast if this
+# format changes in a future pnpm version.
 # ---------------------------------------------------------------------------
 ADVISORY_KEYS=$(jq -r '.advisories | keys[]' "$AUDIT_FILE" 2>/dev/null || true)
 GHSA_IDS=""
@@ -83,7 +86,7 @@ else
 
     # Dependency chains from findings[].paths
     dep_paths=$(jq -r --arg k "$key" '
-      .advisories[$k].findings[].paths[]
+      .advisories[$k].findings[]?.paths[]?
     ' "$AUDIT_FILE" | sort -u)
 
     # Determine direct vs indirect dependency.
@@ -133,13 +136,14 @@ else
     dep_paths_formatted=""
     while IFS= read -r path; do
       [[ -z "$path" ]] && continue
-      dep_paths_formatted="${dep_paths_formatted}\`${path}\`\n"
+      dep_paths_formatted="${dep_paths_formatted}\`${path}\`
+"
     done <<< "$dep_paths"
 
     issue_title="security(deps): ${module_name} — ${severity} (${ghsa_id})"
 
     # Check for existing open issue with same title
-    existing=$(gh issue list --label security --state open --search "in:title ${ghsa_id}" --json title --jq '.[].title')
+    existing=$(gh issue list --label security --state open --limit 500 --search "in:title ${ghsa_id}" --json title --jq '.[].title')
     if echo "$existing" | grep -qF "$issue_title"; then
       echo "Issue already exists: $issue_title"
       continue
@@ -163,7 +167,7 @@ ${title_text}
 <details>
 <summary>依存パス</summary>
 
-$(echo -e "$dep_paths_formatted")
+$(printf '%s' "$dep_paths_formatted")
 
 </details>
 
