@@ -34,11 +34,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run pnpm audit
+        run: pnpm audit --json > audit-result.json || true
+
+      - name: Verify audit output
         run: |
-          pnpm audit --json > audit-result.json
-          audit_exit=$?
-          if [ $audit_exit -ne 0 ] && ! jq -e '.advisories or .vulnerabilities' audit-result.json > /dev/null 2>&1; then
-            echo "::error::pnpm audit failed unexpectedly (exit code: $audit_exit)"
+          if ! jq -e '.advisories or .vulnerabilities' audit-result.json > /dev/null 2>&1; then
+            echo "::error::pnpm audit produced invalid output"
             cat audit-result.json
             exit 1
           fi
