@@ -1,0 +1,4 @@
+{{= data.tags.section }}
+<!-- CUSTOM-TEMPLATE-MARKER -->
+{{=data.method.verb.toUpperCase()}} {{=data.method.path}} — {{=data.operation.summary || ''}}
+{{= data.tags.endSection }}
