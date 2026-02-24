@@ -28,7 +28,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: '--max-turns 3 --model claude-haiku-4-5 --allowed-tools "Bash(gh issue list *),Bash(gh issue view *),Bash(gh issue comment *),Bash(gh issue edit *),Bash(gh label *)"'
+          claude_args: '--max-turns 5 --model claude-haiku-4-5 --allowed-tools "Bash(gh issue list *),Bash(gh issue view *),Bash(gh issue comment *),Bash(gh issue edit * --add-label *),Bash(gh label list *),Bash(gh label create *)"'
           prompt: |
             あなたは Issue トリアージ担当です。以下の手順に従ってください。
 
@@ -41,7 +41,7 @@ jobs:
                - easy: 単一ファイルの小さな変更、明確な修正箇所、テンプレートやドキュメントの軽微な修正
                - medium: 複数ファイルにまたがる変更、設計判断が必要、テストの追加・修正が必要
                - hard: アーキテクチャ変更、外部依存の追加、大規模なリファクタリング
-            5. ラベルが存在しない場合は `gh label create` で作成してから付与する
+            5. ラベルが存在しない場合は `gh label create --force` で作成してから付与する
             6. 難易度に応じてラベルを付与
                - easy → `difficulty/easy` + `claude-implement` + `claude-scanned`
                - medium → `difficulty/medium` + `claude-scanned`
