@@ -67,6 +67,7 @@ bin/cli.js (commander で引数パース)
 
 - `bin/cli.js` — CLI エントリポイント。`package.json` からバージョンを動的読み込み。`convert()` の例外を try-catch で受けて `process.exit(1)` するのは CLI 側の責務
 - `src/convert.mjs` — 変換ロジック本体。`export async function convert(input, opts)` を公開。ライブラリとしても利用可能な設計のため、エラーは `throw` で伝播させる（`process.exit` 禁止）。戻り値は `undefined`（結果はファイルに書き出す設計）。テストでは一時ディレクトリに出力後ファイルを読み込んで検証する
+  - `opts`: `{ output, index, template }` — `output` は出力先ディレクトリ、`index` は `false` で README.md 生成スキップ、`template` はカスタムテンプレートディレクトリパス
 - `templates/openapi3/` — widdershins の doT.js テンプレート群
   - `operation.dot` — エンドポイントを `<details>/<summary>` で囲み、badgers.space の HTTP メソッドバッジを付与
   - `code_shell.dot` — curl 例にリクエストボディ（`-d`）を自動付与
@@ -78,6 +79,7 @@ bin/cli.js (commander で引数パース)
 - Node.js >= 18, ESM (`"type": "module"`)
 - パッケージマネージャ: pnpm
 - リンター / フォーマッター: Biome（`biome.json` の `!!` プレフィックスは Biome 2.x 公式の force-ignore 構文。スキャナーレベルでディレクトリを完全除外する。`!` とは異なる機能）
+  - JS スタイル: ダブルクォート、セミコロン必須、trailing comma あり、インデント 2 スペース、行幅 80
 - 主要依存: widdershins, commander, js-yaml
 - テンプレートエンジン: doT.js（widdershins 内蔵）
 - `pnpm.overrides` で `markdown-it` を `^14.1.0` に固定（widdershins の間接依存 `markdown-it@10` が Node.js 組み込み `punycode` を使用し非推奨警告が出るため）
@@ -95,9 +97,10 @@ doT.js 構文を使用。`{{= }}` で出力、`{{? }}` で条件分岐、`{{~ }}
 
 1. RFC リンク除去 — `[text](https://tools.ietf.org/...)` → `text`
 2. widdershins generator コメント除去
-3. markdownlint 抑制コメント挿入 — `<!-- markdownlint-disable MD024 MD028 -->`
+3. markdownlint 抑制コメント挿入 — `<!-- markdownlint-disable MD024 MD028 MD036 -->`
    - MD024（重複見出し）は `<details>` 内のエンドポイント毎に同じ見出し（Parameters, Responses）が繰り返されるため不可避
    - MD028（blockquote 内の空行）は widdershins 内部生成によるもので制御不可
+   - MD036（強調のみの行）は widdershins が生成するスキーマ見出し等で発生
 
 ## CI/CD
 
