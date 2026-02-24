@@ -2,16 +2,19 @@ name: Issue Scan
 
 on:
   schedule:
-    # Testing: every 30 minutes (change to `0 0 * * 0` after verification)
-    - cron: "*/30 * * * *"
+    - cron: "0 0 * * 0"
   workflow_dispatch:
+
+concurrency:
+  group: issue-scan
+  cancel-in-progress: false
 
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
-      issues: read
+      issues: write
       contents: read
       id-token: write
 
@@ -25,8 +28,39 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: '--max-turns 3 --model claude-haiku-4-5 --allowed-tools "Bash(gh issue *),Bash(gh label create *)"'
           prompt: |
-            List all open issues in this repository using `gh issue list --state open`.
-            Output the issue number, title, and labels for each.
-            This is a read-only verification run — do not modify anything.
-          claude_args: "--max-turns 2 --model claude-sonnet-4-6 --allowed-tools 'Bash(gh issue list *)'"
+            あなたは Issue トリアージ担当です。以下の手順に従ってください。
+
+            ## 手順
+
+            1. `gh issue list --state open --json number,title,labels --limit 50` で open issue を取得
+            2. 以下のラベルが付いている issue はスキップ: `claude-scanned`, `claude-implement`, `difficulty/easy`, `difficulty/medium`, `difficulty/hard`
+            3. スキップ対象外の issue から最大3件を選び、各 issue の内容を `gh issue view <number>` で確認
+            4. 各 issue を難易度判定する
+               - easy: 単一ファイルの小さな変更、明確な修正箇所、テンプレートやドキュメントの軽微な修正
+               - medium: 複数ファイルにまたがる変更、設計判断が必要、テストの追加・修正が必要
+               - hard: アーキテクチャ変更、外部依存の追加、大規模なリファクタリング
+            5. ラベルが存在しない場合は `gh label create` で作成してから付与する
+            6. 難易度に応じてラベルを付与
+               - easy → `difficulty/easy` + `claude-implement` + `claude-scanned`
+               - medium → `difficulty/medium` + `claude-scanned`
+               - hard → `difficulty/hard` + `claude-scanned`
+            7. 各 issue に日本語で判定理由をコメント（`gh issue comment`）
+
+            ## コメントのフォーマット
+
+            ```text
+            ## 自動トリアージ結果
+
+            難易度: easy / medium / hard
+            理由: （判定理由を簡潔に記述）
+            ```
+
+            ## 注意事項
+
+            - ラベル付与とコメント以外の変更は行わないでください
+            - 対象 issue が0件の場合は何もせず終了してください
+
+            ---
+            🤖 モデル: [実際のモデル名] / 💰 コスト: 入力[N]トークン, 出力[M]トークン, $[金額]
