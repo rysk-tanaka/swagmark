@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`スナップショット > サンプルOpenAPIからの出力がスナップショットと一致する 1`] = `
-"<!-- markdownlint-disable MD024 MD028 MD036 -->
+"<!-- markdownlint-disable MD024 MD028 MD033 MD036 -->
 
 # Test Items API v1.0.0
 
