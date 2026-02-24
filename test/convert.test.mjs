@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { convert } from "../src/convert.mjs";
@@ -14,9 +14,13 @@ async function convertAndRead(fixture, subDir = "") {
 }
 
 let validMd;
+let minimalMd;
+let swagger2Md;
 
 beforeAll(async () => {
   validMd = await convertAndRead("valid.yaml");
+  minimalMd = await convertAndRead("minimal.yaml", "minimal");
+  swagger2Md = await convertAndRead("swagger2.yaml", "swagger2");
 });
 
 afterAll(() => {
@@ -155,5 +159,123 @@ describe("YAML読み込み", () => {
 describe("スナップショット", () => {
   test("サンプルOpenAPIからの出力がスナップショットと一致する", () => {
     expect(validMd).toMatchSnapshot();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// minimal.yaml: servers なし・タグなし
+// ---------------------------------------------------------------------------
+
+describe("minimal.yaml（最小構成OpenAPI）", () => {
+  test("servers なしでも正常に変換される", () => {
+    expect(minimalMd).toBeDefined();
+  });
+
+  test("Base URLs セクションが含まれない", () => {
+    expect(minimalMd).not.toContain("Base URLs:");
+  });
+
+  test("エンドポイントが <details> タグで囲まれる", () => {
+    expect(minimalMd).toContain("<details>");
+    expect(minimalMd).toContain("</details>");
+  });
+
+  test("GETバッジが含まれる", () => {
+    expect(minimalMd).toContain("https://badgers.space/badge/_/GET/blue");
+  });
+
+  test("markdownlint 抑制コメントが先頭に挿入される", () => {
+    expect(minimalMd).toMatch(/^<!-- markdownlint-disable /);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Swagger 2.0 入力
+// ---------------------------------------------------------------------------
+
+describe("Swagger 2.0 入力", () => {
+  test("Swagger 2.0 YAMLが正常に変換される", () => {
+    expect(swagger2Md).toBeDefined();
+  });
+
+  test("GETバッジが含まれる", () => {
+    expect(swagger2Md).toContain("https://badgers.space/badge/_/GET/blue");
+  });
+
+  test("POSTバッジが含まれる", () => {
+    expect(swagger2Md).toContain("https://badgers.space/badge/_/POST/green");
+  });
+
+  test("エンドポイントが <details> タグで囲まれる", () => {
+    expect(swagger2Md).toContain("<details>");
+    expect(swagger2Md).toContain("</details>");
+  });
+
+  test("markdownlint 抑制コメントが先頭に挿入される", () => {
+    expect(swagger2Md).toMatch(/^<!-- markdownlint-disable /);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// ディレクトリ入力（一括変換）
+// ---------------------------------------------------------------------------
+
+describe("ディレクトリ入力（一括変換）", () => {
+  const DIR_OUT = join(TMP_DIR, "dir-out");
+
+  test("ディレクトリ内の全 YAML ファイルが変換される", async () => {
+    await convert("test/fixtures/dir", { output: DIR_OUT, index: false });
+    expect(existsSync(join(DIR_OUT, "api-a.md"))).toBe(true);
+    expect(existsSync(join(DIR_OUT, "api-b.md"))).toBe(true);
+  });
+
+  test("index: true のとき README.md が生成される", async () => {
+    const outDir = join(TMP_DIR, "dir-index");
+    await convert("test/fixtures/dir", { output: outDir, index: true });
+    expect(existsSync(join(outDir, "README.md"))).toBe(true);
+  });
+
+  test("YAML ファイルが存在しないディレクトリでエラーをthrowする", async () => {
+    const emptyDir = join(TMP_DIR, "empty-dir");
+    mkdirSync(emptyDir, { recursive: true });
+    await expect(
+      convert(emptyDir, { output: join(TMP_DIR, "empty-out") }),
+    ).rejects.toThrow("No YAML files found");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// --no-index オプション
+// ---------------------------------------------------------------------------
+
+describe("--no-index オプション", () => {
+  test("index: false のとき README.md が生成されない", async () => {
+    const outDir = join(TMP_DIR, "no-index");
+    await convert("test/fixtures/valid.yaml", { output: outDir, index: false });
+    expect(existsSync(join(outDir, "README.md"))).toBe(false);
+    expect(existsSync(join(outDir, "valid.md"))).toBe(true);
+  });
+
+  test("index オプション省略時（デフォルト）は README.md が生成される", async () => {
+    const outDir = join(TMP_DIR, "with-index");
+    await convert("test/fixtures/valid.yaml", { output: outDir });
+    expect(existsSync(join(outDir, "README.md"))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// カスタムテンプレート（-t オプション）
+// ---------------------------------------------------------------------------
+
+describe("カスタムテンプレート（-t オプション）", () => {
+  test("カスタム operation.dot の内容が出力に反映される", async () => {
+    const outDir = join(TMP_DIR, "custom-tpl");
+    await convert("test/fixtures/valid.yaml", {
+      output: outDir,
+      index: false,
+      template: "test/fixtures/custom-template",
+    });
+    const md = readFileSync(join(outDir, "valid.md"), "utf-8");
+    expect(md).toContain("<!-- CUSTOM-TEMPLATE-MARKER -->");
   });
 });

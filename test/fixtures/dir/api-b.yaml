@@ -1,0 +1,21 @@
+openapi: "3.0.0"
+info:
+  title: API B
+  version: 1.0.0
+paths:
+  /b:
+    post:
+      summary: Endpoint B
+      operationId: endpointB
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Created
