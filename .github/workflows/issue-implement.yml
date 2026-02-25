@@ -50,7 +50,8 @@ jobs:
             );
 
             const existingPr = pullRequests.find((pr) =>
-              closesPattern.test(pr.body ?? "")
+              closesPattern.test(pr.body ?? "") ||
+              pr.head?.ref === `implement-issue-${issueNumber}`
             );
 
             if (existingPr) {
