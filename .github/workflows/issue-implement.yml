@@ -45,7 +45,7 @@ jobs:
             );
 
             const closesPattern = new RegExp(
-              `Closes\\s+\`?#${issueNumber}\`?\\b`,
+              `(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\\s+\`?#${issueNumber}\`?\\b`,
               "i"
             );
 
@@ -86,22 +86,23 @@ jobs:
 
       - name: Implement issue with Claude
         if: steps.guard.outputs.skip != 'true'
-        uses: anthropics/claude-code-action@beta
+        uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: '--max-turns 25 --model claude-sonnet-4-6 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git *),Bash(gh issue view *),Bash(gh pr create *),Bash(gh pr edit *),Bash(pnpm *)"'
+          claude_args: '--max-turns 25 --model claude-sonnet-4-6 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git add *),Bash(git commit *),Bash(git checkout *),Bash(git push origin *),Bash(git status *),Bash(git diff *),Bash(gh issue view *),Bash(gh pr create *),Bash(gh pr edit *),Bash(pnpm *)"'
           prompt: |
             Issue #${{ github.event.issue.number }} を実装し、PR を作成してください。
 
             手順:
             1. `gh issue view ${{ github.event.issue.number }}` で Issue の要件を確認する
-            2. `git checkout -b implement-issue-${{ github.event.issue.number }}` で作業ブランチを作成する（既存ならそのブランチを使う）
+            2. `git checkout implement-issue-${{ github.event.issue.number }} 2>/dev/null || git checkout -b implement-issue-${{ github.event.issue.number }}` で作業ブランチを作成する
             3. 実装を行う
-            4. `pnpm test` を実行して品質を確認する
-            5. `pnpm format` を実行して整形する
-            6. 変更をコミットしてプッシュする
-            7. `gh pr create` で PR を作成し、本文に必ず `Closes #${{ github.event.issue.number }}` を含める
-            8. `gh pr edit --add-label claude-review` で PR に `claude-review` ラベルを付与する
+            4. `pnpm test` を実行してテストを確認する
+            5. `pnpm lint` を実行して lint エラーがないことを確認する
+            6. `pnpm format` を実行して整形する
+            7. 変更をコミットしてプッシュする
+            8. `gh pr create` で PR を作成し、本文に必ず `Closes #${{ github.event.issue.number }}` を含める
+            9. `gh pr edit --add-label claude-review` で PR に `claude-review` ラベルを付与する
 
             要件:
             - 既存のコーディング規約に従う
