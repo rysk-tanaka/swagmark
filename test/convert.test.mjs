@@ -16,11 +16,13 @@ async function convertAndRead(fixture, subDir = "") {
 let validMd;
 let minimalMd;
 let swagger2Md;
+let extraMethodsMd;
 
 beforeAll(async () => {
   validMd = await convertAndRead("valid.yaml");
   minimalMd = await convertAndRead("minimal.yaml", "minimal");
   swagger2Md = await convertAndRead("swagger2.yaml", "swagger2");
+  extraMethodsMd = await convertAndRead("extra-methods.yaml", "extra-methods");
 });
 
 afterAll(() => {
@@ -60,6 +62,48 @@ describe("HTTPメソッドバッジ", () => {
     expect(validMd).toContain("![🟠 PUT]");
     expect(validMd).toContain("![🔴 DELETE]");
     expect(validMd).toContain("![🟣 PATCH]");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// head/options/trace メソッド対応
+// ---------------------------------------------------------------------------
+
+describe("head/options/trace メソッド対応", () => {
+  test("HEADエンドポイントにlightgreyバッジURLが含まれる", () => {
+    expect(extraMethodsMd).toContain(
+      "https://badgers.space/badge/_/HEAD/lightgrey",
+    );
+  });
+
+  test("OPTIONSエンドポイントにlightgreyバッジURLが含まれる", () => {
+    expect(extraMethodsMd).toContain(
+      "https://badgers.space/badge/_/OPTIONS/lightgrey",
+    );
+  });
+
+  test("TRACEエンドポイントにlightgreyバッジURLが含まれる", () => {
+    expect(extraMethodsMd).toContain(
+      "https://badgers.space/badge/_/TRACE/lightgrey",
+    );
+  });
+
+  test("バッジにaltテキスト（絵文字+メソッド名）が含まれる", () => {
+    expect(extraMethodsMd).toContain("![⚪ HEAD]");
+    expect(extraMethodsMd).toContain("![⚪ OPTIONS]");
+    expect(extraMethodsMd).toContain("![⚪ TRACE]");
+  });
+
+  test("head/options/trace がインデックスに含まれる", async () => {
+    const outDir = join(TMP_DIR, "extra-methods-index");
+    await convert("test/fixtures/extra-methods.yaml", {
+      output: outDir,
+      index: true,
+    });
+    const readme = readFileSync(join(outDir, "README.md"), "utf-8");
+    expect(readme).toContain("https://badgers.space/badge/_/HEAD/lightgrey");
+    expect(readme).toContain("https://badgers.space/badge/_/OPTIONS/lightgrey");
+    expect(readme).toContain("https://badgers.space/badge/_/TRACE/lightgrey");
   });
 });
 

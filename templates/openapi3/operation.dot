@@ -1,6 +1,6 @@
-{{ var defined_badgeColors = {GET:'blue',POST:'green',PUT:'orange',DELETE:'red',PATCH:'purple',HEAD:'lightgrey',OPTIONS:'lightgrey'}; }}
+{{ var defined_badgeColors = {GET:'blue',POST:'green',PUT:'orange',DELETE:'red',PATCH:'purple',HEAD:'lightgrey',OPTIONS:'lightgrey',TRACE:'lightgrey'}; }}
 {{ var defined_badgeColor = defined_badgeColors[data.method.verb.toUpperCase()] || 'lightgrey'; }}
-{{ var defined_badgeEmojis = {GET:'🔵',POST:'🟢',PUT:'🟠',DELETE:'🔴',PATCH:'🟣',HEAD:'⚪',OPTIONS:'⚪'}; }}
+{{ var defined_badgeEmojis = {GET:'🔵',POST:'🟢',PUT:'🟠',DELETE:'🔴',PATCH:'🟣',HEAD:'⚪',OPTIONS:'⚪',TRACE:'⚪'}; }}
 {{ var defined_badgeEmoji = defined_badgeEmojis[data.method.verb.toUpperCase()] || '⚪'; }}
 
 {{= data.tags.section }}

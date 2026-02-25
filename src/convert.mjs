@@ -31,6 +31,9 @@ const badgeColors = {
   put: "orange",
   delete: "red",
   patch: "purple",
+  head: "lightgrey",
+  options: "lightgrey",
+  trace: "lightgrey",
 };
 
 const badgeEmojis = {
@@ -39,13 +42,27 @@ const badgeEmojis = {
   put: "🟠",
   delete: "🔴",
   patch: "🟣",
+  head: "⚪",
+  options: "⚪",
+  trace: "⚪",
 };
 
 function extractEndpoints(spec) {
   const endpoints = [];
   for (const [path, methods] of Object.entries(spec.paths || {})) {
     for (const [method, op] of Object.entries(methods)) {
-      if (["get", "post", "put", "delete", "patch"].includes(method)) {
+      if (
+        [
+          "get",
+          "post",
+          "put",
+          "delete",
+          "patch",
+          "head",
+          "options",
+          "trace",
+        ].includes(method)
+      ) {
         endpoints.push({
           method: method.toUpperCase(),
           path,

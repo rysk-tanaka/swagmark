@@ -1,0 +1,30 @@
+openapi: "3.0.0"
+info:
+  title: Extra Methods API
+  version: 1.0.0
+paths:
+  /items:
+    head:
+      summary: Check items
+      operationId: headItems
+      tags:
+        - items
+      responses:
+        '200':
+          description: Items exist
+    options:
+      summary: CORS preflight
+      operationId: optionsItems
+      tags:
+        - items
+      responses:
+        '204':
+          description: Allowed methods
+    trace:
+      summary: Trace request
+      operationId: traceItems
+      tags:
+        - items
+      responses:
+        '200':
+          description: Trace response
