@@ -14,6 +14,17 @@ import widdershins from "widdershins";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const httpMethods = [
+  "get",
+  "post",
+  "put",
+  "delete",
+  "patch",
+  "head",
+  "options",
+  "trace",
+];
+
 const badgeColors = {
   get: "blue",
   post: "green",
@@ -57,7 +68,11 @@ async function convertFile(file, inputDir, outputDir, templateDir) {
   const endpoints = extractEndpoints(spec);
   const tag =
     Object.values(spec.paths || {})
-      .flatMap((m) => Object.values(m))
+      .flatMap((item) =>
+        Object.entries(item)
+          .filter(([key]) => httpMethods.includes(key))
+          .map(([, op]) => op),
+      )
       .find((op) => op?.tags)?.tags?.[0] || name;
 
   const options = {
