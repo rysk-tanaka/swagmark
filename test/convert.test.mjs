@@ -265,6 +265,23 @@ describe("--no-index オプション", () => {
 });
 
 // ---------------------------------------------------------------------------
+// タグ抽出（非オペレーションフィールド除外）
+// ---------------------------------------------------------------------------
+
+describe("タグ抽出（非オペレーションフィールド除外）", () => {
+  test("Path Item の非オペレーションフィールドに tags があっても無視される", async () => {
+    const outDir = join(TMP_DIR, "path-params-tags");
+    await convert("test/fixtures/path-params-tags.yaml", {
+      output: outDir,
+      index: true,
+    });
+    const readme = readFileSync(join(outDir, "README.md"), "utf-8");
+    expect(readme).toContain("correct-tag");
+    expect(readme).not.toContain("wrong-tag");
+  });
+});
+
+// ---------------------------------------------------------------------------
 // カスタムテンプレート（-t オプション）
 // ---------------------------------------------------------------------------
 
