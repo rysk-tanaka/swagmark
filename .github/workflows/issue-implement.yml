@@ -115,7 +115,7 @@ jobs:
             4. `pnpm test` を実行してテストを確認する
             5. `pnpm lint` を実行して lint エラーがないことを確認する
             6. `pnpm format` を実行して整形する
-            7. 変更をコミットしてプッシュする
+            7. 変更をコミットして `git push origin implement-issue-${{ github.event.issue.number }}` でプッシュする（`-u` フラグ不可）
             8. `gh pr create` で PR を作成し、本文に必ず `Closes #${{ github.event.issue.number }}` を含める
             9. `gh pr edit --add-label claude-review` で PR に `claude-review` ラベルを付与する
 
