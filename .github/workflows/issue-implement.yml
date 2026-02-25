@@ -1,0 +1,137 @@
+name: Issue Implement
+
+on:
+  issues:
+    types: [labeled]
+
+concurrency:
+  group: issue-implement-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  implement:
+    if: github.event.label.name == 'claude-implement' && github.event.issue.state == 'open'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Check for existing implementation PR
+        id: guard
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const issueNumber = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const pullRequests = await github.paginate(
+              github.rest.pulls.list,
+              {
+                owner,
+                repo,
+                state: "open",
+                per_page: 100,
+              }
+            );
+
+            const closesPattern = new RegExp(
+              `(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\\s+\`?#${issueNumber}\`?\\b`,
+              "i"
+            );
+
+            const existingPr = pullRequests.find((pr) =>
+              closesPattern.test(pr.body ?? "") ||
+              pr.head?.ref === `implement-issue-${issueNumber}`
+            );
+
+            if (existingPr) {
+              core.info(
+                `Existing PR found for issue #${issueNumber}: #${existingPr.number}`
+              );
+              core.setOutput("skip", "true");
+              core.setOutput("existing_pr_number", String(existingPr.number));
+              return;
+            }
+
+            core.setOutput("skip", "false");
+
+      - name: Skip when implementation PR already exists
+        if: steps.guard.outputs.skip == 'true'
+        run: |
+          echo "Existing PR: #${{ steps.guard.outputs.existing_pr_number }}"
+
+      - name: Enable pnpm via corepack
+        if: steps.guard.outputs.skip != 'true'
+        run: corepack enable pnpm
+
+      - name: Setup Node.js
+        if: steps.guard.outputs.skip != 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.guard.outputs.skip != 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Configure git identity
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # Test/lint/format are intentionally inside the Claude prompt rather
+      # than separate workflow steps. Claude needs to iterate on failures
+      # (fix code → re-run tests) within a single autonomous step.
+      # Security is enforced by --allowed-tools, and CI runs on the
+      # created PR as an additional safety net (ci-auto-fix.yml handles
+      # failures automatically).
+      - name: Implement issue with Claude
+        if: steps.guard.outputs.skip != 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: '--max-turns 25 --model claude-sonnet-4-6 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git fetch origin *),Bash(git add *),Bash(git commit *),Bash(git checkout *),Bash(git push origin implement-issue-*),Bash(git status *),Bash(git diff *),Bash(gh issue view *),Bash(gh pr create *),Bash(gh pr edit * --add-label *),Bash(pnpm install *),Bash(pnpm test *),Bash(pnpm lint *),Bash(pnpm format *)"'
+          prompt: |
+            Issue #${{ github.event.issue.number }} を実装し、PR を作成してください。
+
+            手順:
+            1. `gh issue view ${{ github.event.issue.number }}` で Issue の要件を確認する
+            2. 作業ブランチを作成する: `git fetch origin implement-issue-${{ github.event.issue.number }}:implement-issue-${{ github.event.issue.number }} 2>/dev/null && git checkout implement-issue-${{ github.event.issue.number }} || git checkout -b implement-issue-${{ github.event.issue.number }}`
+            3. 実装を行う
+            4. `pnpm test` を実行してテストを確認する
+            5. `pnpm lint` を実行して lint エラーがないことを確認する
+            6. `pnpm format` を実行して整形する
+            7. 変更をコミットしてプッシュする
+            8. `gh pr create` で PR を作成し、本文に必ず `Closes #${{ github.event.issue.number }}` を含める
+            9. `gh pr edit --add-label claude-review` で PR に `claude-review` ラベルを付与する
+
+            要件:
+            - 既存のコーディング規約に従う
+            - コミットメッセージは英語で Conventional Commits 形式にする
+            - PR には変更内容とテスト結果を簡潔に記載する
+
+      - name: Notify failure to issue
+        if: failure() && steps.guard.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          message=$(
+            cat <<EOF
+          自動実装に失敗しました。以下のワークフロー実行ログを確認してください。
+
+          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EOF
+          )
+          gh issue comment "${{ github.event.issue.number }}" --body "$message"

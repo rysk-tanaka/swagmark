@@ -47,6 +47,7 @@ jobs:
                - medium → `difficulty/medium` + `claude-scanned`
                - hard → `difficulty/hard` + `claude-scanned`
             7. 各 issue に日本語で判定理由をコメント（`gh issue comment`）
+            8. medium または hard の issue には追加で `@coderabbitai plan` をコメント（`gh issue comment`）して実装計画の生成を依頼する（easy はこのステップをスキップ）
 
             ## コメントのフォーマット
 
