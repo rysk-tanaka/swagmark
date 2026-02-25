@@ -90,6 +90,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      # Test/lint/format are intentionally inside the Claude prompt rather
+      # than separate workflow steps. Claude needs to iterate on failures
+      # (fix code → re-run tests) within a single autonomous step.
+      # Security is enforced by --allowed-tools, and CI runs on the
+      # created PR as an additional safety net (ci-auto-fix.yml handles
+      # failures automatically).
       - name: Implement issue with Claude
         if: steps.guard.outputs.skip != 'true'
         uses: anthropics/claude-code-action@v1
