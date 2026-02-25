@@ -101,9 +101,9 @@ describe("head/options/trace メソッド対応", () => {
       index: true,
     });
     const readme = readFileSync(join(outDir, "README.md"), "utf-8");
-    expect(readme).toContain("HEAD");
-    expect(readme).toContain("OPTIONS");
-    expect(readme).toContain("TRACE");
+    expect(readme).toContain("https://badgers.space/badge/_/HEAD/lightgrey");
+    expect(readme).toContain("https://badgers.space/badge/_/OPTIONS/lightgrey");
+    expect(readme).toContain("https://badgers.space/badge/_/TRACE/lightgrey");
   });
 });
 
