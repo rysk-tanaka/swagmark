@@ -122,8 +122,9 @@ markdownlint 抑制は二層構造で運用している。
 - `claude.yml` — `@claude` メンションへの応答ワークフロー。`issue_comment`、`pull_request_review_comment`、`issues`、`pull_request_review` をトリガーに Claude Code を実行
 - `claude-code-review.yml` — `claude-review` ラベル付き PR の自動コードレビュー（claude-code-action、オプトイン方式）
 - `issue-scan.yml` — 週次 cron（日曜 UTC 0:00）+ `workflow_dispatch` で open issue をトリアージ。claude-haiku-4-5 で難易度判定（easy/medium/hard）し、ラベル付与とコメントを行う。easy は `claude-implement` ラベルを付与して自動実装ワークフローに連携
-- `issue-implement.yml` — `claude-implement` ラベルが付与された Issue を検知して Claude が自動実装。`implement-issue-{number}` ブランチ作成、コミット、PR 作成まで実行し、PR に `claude-review` ラベルを付与して `claude-code-review.yml` と連携
+- `issue-implement.yml` — `claude-implement` ラベルが付与された open Issue を検知して Claude（opus）が自動実装。`implement-issue-{number}` ブランチ作成、コミット、PR 作成まで実行し、PR に `claude-review` ラベルを付与して `claude-code-review.yml` と連携。重複 PR ガード（本文のクローズキーワード + ブランチ名で判定）あり
 - `dependabot-scan.yml` — `workflow_dispatch` で手動実行。`pnpm audit` で脆弱性を検出し、シェルスクリプトが依存チェーンを分析して対応方針（`pnpm.overrides` 追加等）を Issue に起票。解消済み Issue は自動クローズ
+- ワークフロー共通規約 — git identity ステップ名は "Configure git identity"、`--allowed-tools` は最小権限（`Bash(git *)` や `Bash(pnpm *)` のようなワイルドカードは禁止、個別サブコマンドを指定）、ツール順序は `Read,Edit,Write,Glob,Grep` で統一
 - claude-code-action を使うワークフローには `id-token: write` 権限が必須。`github_token` を明示指定しない場合、アクションは OIDC トークンを取得して Claude GitHub App のインストールトークンに交換する。`GITHUB_TOKEN` へのフォールバックはないため、この権限がないとアクション全体が失敗する
 - Issue 自動対応フロー — `issue-scan.yml`（scan）→ `issue-implement.yml`（implement）→ `claude-code-review.yml`（review）の順で処理
 - ラベル体系 — `claude-scanned` はトリアージ済みの印、`difficulty/*` は実装難易度（easy/medium/hard）、`claude-implement` は自動実装トリガー

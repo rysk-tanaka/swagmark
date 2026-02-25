@@ -34,7 +34,7 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Setup git identity
+      - name: Configure git identity
         if: steps.guard.outputs.skip != 'true'
         run: |
           git config user.name "github-actions[bot]"
@@ -94,7 +94,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: '--model claude-sonnet-4-6 --allowed-tools "Edit,Write,Read,Glob,Grep,Bash(git *),Bash(pnpm *),Bash(gh pr comment *),Bash(gh pr view *)"'
+          claude_args: '--model claude-sonnet-4-6 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git add *),Bash(git commit *),Bash(git push origin *),Bash(git status *),Bash(git diff *),Bash(pnpm test),Bash(pnpm test *),Bash(gh pr comment *),Bash(gh pr view *)"'
           prompt: |
             CI テストが失敗しました。エラーログを分析して修正し、このブランチにプッシュしてください。
 
