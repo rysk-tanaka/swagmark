@@ -121,7 +121,7 @@ jobs:
 
             要件:
             - 既存のコーディング規約に従う
-            - コミットメッセージは英語で Conventional Commits 形式にする
+            - コミットメッセージは英語で Conventional Commits 形式、単一行にする（HEREDOC やマルチライン不可）
             - PR には変更内容とテスト結果を簡潔に記載する
 
       - name: Notify failure to issue

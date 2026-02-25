@@ -89,6 +89,11 @@ bin/cli.js (commander で引数パース)
 - GitHub Actions: actions/checkout@v6, actions/setup-node@v6（いずれも正式リリース済み）
   - pnpm キャッシュを使う場合、`corepack enable pnpm` を `actions/setup-node`（`cache: pnpm`）より前に実行する必要がある
 
+## コミット規約
+
+- 英語で Conventional Commits 形式（`feat:`, `fix:`, `chore:` 等）
+- コミットメッセージは単一行にする（マルチライン・HEREDOC 不可）
+
 ## テンプレート編集時の注意
 
 doT.js 構文を使用。`{{= }}` で出力、`{{? }}` で条件分岐、`{{~ }}` でループ、`{{ }}` で JS 実行。テンプレート内で定義した変数は `defined_` プレフィックスで命名する慣習がある（例: `defined_badgeColor`）。
