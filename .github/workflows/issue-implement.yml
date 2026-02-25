@@ -122,7 +122,7 @@ jobs:
             要件:
             - 既存のコーディング規約に従う
             - コミットメッセージは英語で Conventional Commits 形式、単一行にする（HEREDOC やマルチライン不可）
-            - PR には変更内容とテスト結果を簡潔に記載する
+            - PR 本文は `.github/pull_request_template.md` のテンプレートに従う（該当しないセクションは省略可）
 
       - name: Notify failure to issue
         if: failure() && steps.guard.outputs.skip != 'true'
