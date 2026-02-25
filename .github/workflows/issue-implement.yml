@@ -84,26 +84,31 @@ jobs:
         if: steps.guard.outputs.skip != 'true'
         run: pnpm install --frozen-lockfile
 
+      - name: Configure git identity
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Implement issue with Claude
         if: steps.guard.outputs.skip != 'true'
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: '--max-turns 25 --model claude-sonnet-4-6 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git config *),Bash(git fetch *),Bash(git add *),Bash(git commit *),Bash(git checkout *),Bash(git push origin *),Bash(git status *),Bash(git diff *),Bash(gh issue view *),Bash(gh pr create *),Bash(gh pr edit * --add-label *),Bash(pnpm install *),Bash(pnpm test *),Bash(pnpm lint *),Bash(pnpm format *)"'
+          claude_args: '--max-turns 25 --model claude-sonnet-4-6 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git fetch origin *),Bash(git add *),Bash(git commit *),Bash(git checkout *),Bash(git push origin *),Bash(git status *),Bash(git diff *),Bash(gh issue view *),Bash(gh pr create *),Bash(gh pr edit * --add-label *),Bash(pnpm install *),Bash(pnpm test *),Bash(pnpm lint *),Bash(pnpm format *)"'
           prompt: |
             Issue #${{ github.event.issue.number }} を実装し、PR を作成してください。
 
             手順:
-            1. git identity を設定する: `git config user.name "github-actions[bot]"` と `git config user.email "41898282+github-actions[bot]@users.noreply.github.com"`
-            2. `gh issue view ${{ github.event.issue.number }}` で Issue の要件を確認する
-            3. 作業ブランチを作成する: `git fetch origin implement-issue-${{ github.event.issue.number }} && git checkout implement-issue-${{ github.event.issue.number }} || git checkout -b implement-issue-${{ github.event.issue.number }}`
-            4. 実装を行う
-            5. `pnpm test` を実行してテストを確認する
-            6. `pnpm lint` を実行して lint エラーがないことを確認する
-            7. `pnpm format` を実行して整形する
-            8. 変更をコミットしてプッシュする
-            9. `gh pr create` で PR を作成し、本文に必ず `Closes #${{ github.event.issue.number }}` を含める
-            10. `gh pr edit --add-label claude-review` で PR に `claude-review` ラベルを付与する
+            1. `gh issue view ${{ github.event.issue.number }}` で Issue の要件を確認する
+            2. 作業ブランチを作成する: `git fetch origin implement-issue-${{ github.event.issue.number }} && git checkout implement-issue-${{ github.event.issue.number }} || git checkout -b implement-issue-${{ github.event.issue.number }}`
+            3. 実装を行う
+            4. `pnpm test` を実行してテストを確認する
+            5. `pnpm lint` を実行して lint エラーがないことを確認する
+            6. `pnpm format` を実行して整形する
+            7. 変更をコミットしてプッシュする
+            8. `gh pr create` で PR を作成し、本文に必ず `Closes #${{ github.event.issue.number }}` を含める
+            9. `gh pr edit --add-label claude-review` で PR に `claude-review` ラベルを付与する
 
             要件:
             - 既存のコーディング規約に従う
