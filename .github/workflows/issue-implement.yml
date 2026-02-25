@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   implement:
-    if: github.event.label.name == 'claude-implement'
+    if: github.event.label.name == 'claude-implement' && github.event.issue.state == 'open'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
