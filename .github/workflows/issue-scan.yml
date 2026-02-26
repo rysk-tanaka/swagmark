@@ -2,7 +2,9 @@ name: Issue Scan
 
 on:
   schedule:
-    - cron: "30 1 * * *"
+    # 09:50 JST (00:50 UTC): GitHub Actions schedule は数時間の遅延が発生するため、
+    # クレジット 5h 枠の切り替わり後（10:00 JST 以降）に実行されるよう余裕を持たせた設定
+    - cron: "50 0 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -29,7 +31,10 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # max-turns 15: list(1) + per-issue view/label/comment(3-4) × 3件 ≈ 10-13
-          claude_args: '--max-turns 15 --model claude-haiku-4-5 --allowed-tools "Bash(gh issue list *),Bash(gh issue view *),Bash(gh issue comment *),Bash(gh issue edit * --add-label *),Bash(gh label list *),Bash(gh label create *)"'
+          # claude-implement ラベルは issue-implement.yml のトリガー。
+          # 複数ラベルを同時付与すると concurrency の pending キャンセルで
+          # 実装ワークフローが起動しないため、プロンプトで最後に付与するよう指示している。
+          claude_args: '--max-turns 15 --model claude-haiku-4-5 --allowed-tools "Write,Bash(gh issue list *),Bash(gh issue view *),Bash(gh issue comment * --body-file *),Bash(gh issue edit * --add-label *),Bash(gh label list *),Bash(gh label create *)"'
           prompt: |
             あなたは Issue トリアージ担当です。以下の手順に従ってください。
 
@@ -44,9 +49,10 @@ jobs:
                - hard: アーキテクチャ変更、外部依存の追加、大規模なリファクタリング
             5. ラベルが存在しない場合は `gh label create --force` で作成してから付与する
             6. 難易度に応じてラベルを付与
-               - easy → `difficulty/easy` + `claude-implement` + `claude-scanned`
-               - medium → `difficulty/medium` + `claude-scanned`
-               - hard → `difficulty/hard` + `claude-scanned`
+               `claude-implement` は issue-implement ワークフローのトリガーになるため、他のラベルをすべて付与した後に最後に付与すること。同時に複数ラベルを付与すると concurrency の pending キャンセルで実装ワークフローが起動しない場合がある。
+               - easy → `difficulty/easy` → `claude-scanned` → `claude-implement`
+               - medium → `difficulty/medium` → `claude-scanned`
+               - hard → `difficulty/hard` → `claude-scanned`
             7. 各 issue に日本語で判定理由をコメント（`gh issue comment`）
             8. medium または hard の issue には追加で `@coderabbitai plan` をコメント（`gh issue comment`）して実装計画の生成を依頼する（easy はこのステップをスキップ）
 
@@ -64,4 +70,4 @@ jobs:
             - ラベル付与とコメント以外の変更は行わないでください
             - 対象 issue が0件の場合は何もせず終了してください
             - `gh issue view` は1コマンドにつき1件のみ実行してください（複数コマンドを `&&` や `;` で結合しない）
-            - `gh issue comment` は `--body` フラグを使用してください（`-b` は使用しない）
+            - `gh issue comment` は `--body-file` フラグを使用してください。本文を `/tmp/comment-<number>.md` に Write ツールで書き出してから `gh issue comment <number> --body-file /tmp/comment-<number>.md` で投稿してください（`--body` や `-b` は使用しない）
