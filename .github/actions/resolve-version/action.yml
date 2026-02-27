@@ -41,4 +41,4 @@ runs:
         INPUT_VERSION_COMMAND: ${{ inputs.version_command }}
         INPUT_TAG_PREFIX: ${{ inputs.tag_prefix }}
       shell: bash
-      run: ${{ github.action_path }}/resolve-version.sh
+      run: bash "${{ github.action_path }}/resolve-version.sh"
