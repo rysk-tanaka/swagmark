@@ -141,11 +141,11 @@ markdownlint 抑制は二層構造で運用している。
   - npm レジストリへの公開 — `vars.PUBLISH_NPM == 'true'` + `NPM_TOKEN` シークレットで有効化
   - Docker イメージの GHCR への push — `vars.PUBLISH_DOCKER == 'true'` で有効化
   - `workflow_dispatch` で手動再実行にも対応（既存タグは安全にスキップ）
-- `resolve-version.yml` — `workflow_call` 専用。package.json / pyproject.toml / Cargo.toml / VERSION ファイル / 任意コマンドからバージョンを自動検出する共通処理
-- `release-core.yml` — `workflow_call` 専用。タグ作成と GitHub Release 作成の共通処理（冪等性を考慮した既存タグ/リリースのスキップ付き）
-- `release-on-version-change.yml` — `workflow_call` 専用。resolve-version → release-core を連携するオーケストレーション層
+- `release-on-version-change.yml` — `workflow_call` 専用。バージョン解決 → タグ作成 → Release 作成を1ジョブで実行するオーケストレーション層。内部で composite action（`.github/actions/resolve-version`、`.github/actions/release-core`）を使用
+- `.github/actions/resolve-version/` — composite action。package.json / pyproject.toml / Cargo.toml / VERSION ファイル / 任意コマンドからバージョンを自動検出。ロジックは `resolve-version.sh` に分離
+- `.github/actions/release-core/` — composite action。タグ作成と GitHub Release 作成（冪等性を考慮した既存タグ/リリースのスキップ付き）
 
-リリースフロー: version bump → push to main → auto-release → release-on-version-change（resolve-version → release-core）→ publish
+リリースフロー: version bump → push to main → auto-release → release-on-version-change（resolve-version action → release-core action）→ publish
 
 ワークフローの詳細な一覧と連携関係は `.github/workflows/README.md` を参照。
 

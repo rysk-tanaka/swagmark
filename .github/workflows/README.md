@@ -15,9 +15,7 @@
 | Workflow | Status | 主目的 | トリガー | 依存アクション |
 | --- | --- | --- | --- | --- |
 | [auto-release.yml](./auto-release.yml) | [![Release](https://github.com/rysk-tanaka/swagmark/actions/workflows/auto-release.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/auto-release.yml) | 公開系ジョブのオーケストレーション（major tag、npm、GHCR） | `push` (main, `package.json`), `workflow_dispatch` | `actions/checkout@v6`, `actions/setup-node@v6`, `docker/setup-buildx-action@v3`, `docker/login-action@v3`, `docker/build-push-action@v6` |
-| [release-on-version-change.yml](./release-on-version-change.yml) | - | バージョン変更時のタグ作成と Release 作成 | `workflow_call` | - |
-| [resolve-version.yml](./resolve-version.yml) | - | バージョン解決の共通処理 | `workflow_call` | `actions/checkout@v6` |
-| [release-core.yml](./release-core.yml) | - | タグ作成と Release 作成の共通処理 | `workflow_call` | `actions/checkout@v6` |
+| [release-on-version-change.yml](./release-on-version-change.yml) | - | バージョン変更時のタグ作成と Release 作成 | `workflow_call` | `actions/checkout@v6` |
 
 ## Issue 自動化
 
@@ -42,14 +40,12 @@
 | [issue-scan.yml](./issue-scan.yml) | [issue-implement.yml](./issue-implement.yml) | `claude-implement` ラベル付与で実装ワークフローを起動 |
 | [issue-implement.yml](./issue-implement.yml) | [claude-code-review.yml](./claude-code-review.yml) | PR 作成後に `claude-review` ラベル付与でレビューを起動 |
 | [auto-release.yml](./auto-release.yml) | [release-on-version-change.yml](./release-on-version-change.yml) | `workflow_call` でリリース処理を委譲 |
-| [release-on-version-change.yml](./release-on-version-change.yml) | [resolve-version.yml](./resolve-version.yml) | `workflow_call` でバージョン解決を委譲 |
-| [release-on-version-change.yml](./release-on-version-change.yml) | [release-core.yml](./release-core.yml) | `workflow_call` でタグ・Release 作成を委譲 |
 
 ## 依存アクション一覧
 
 | Action | 採用バージョン | 利用 workflow |
 | --- | --- | --- |
-| `actions/checkout` | `v6` | `auto-release.yml`, `ci-auto-fix.yml`, `claude-code-review.yml`, `claude.yml`, `dependabot-scan.yml`, `issue-implement.yml`, `issue-scan.yml`, `lint.yml`, `release-core.yml`, `resolve-version.yml`, `test.yml` |
+| `actions/checkout` | `v6` | `auto-release.yml`, `ci-auto-fix.yml`, `claude-code-review.yml`, `claude.yml`, `dependabot-scan.yml`, `issue-implement.yml`, `issue-scan.yml`, `lint.yml`, `release-on-version-change.yml`, `test.yml` |
 | `actions/setup-node` | `v6` | `auto-release.yml`, `ci-auto-fix.yml`, `dependabot-scan.yml`, `issue-implement.yml`, `lint.yml`, `test.yml` |
 | `biomejs/setup-biome` | `v2` | `lint.yml` |
 | `actions/github-script` | `v8` | `ci-auto-fix.yml`, `issue-implement.yml` |
