@@ -49,6 +49,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Update major version tag
         run: |
+          set -euo pipefail
           MAJOR="v$(jq -r '.version' package.json | cut -d. -f1)"
           git tag -f "$MAJOR"
           git push origin "$MAJOR" --force
