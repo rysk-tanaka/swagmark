@@ -124,6 +124,14 @@ jobs:
             - コミットメッセージは英語で Conventional Commits 形式、単一行にする（HEREDOC やマルチライン不可）
             - PR 本文は `.github/pull_request_template.md` のテンプレートに従う（該当しないセクションは省略可）
 
+      - name: Request CodeRabbit review
+        if: success() && steps.guard.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER=$(gh pr view "implement-issue-${{ github.event.issue.number }}" --json number --jq .number)
+          gh pr comment "$PR_NUMBER" --body "@coderabbitai review"
+
       - name: Post report to issue
         if: (success() || failure()) && steps.guard.outputs.skip != 'true'
         env:
