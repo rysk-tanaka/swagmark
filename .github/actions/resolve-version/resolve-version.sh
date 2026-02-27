@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Requires Python 3.11+ (tomllib)
 extract_from_pyproject() {
   [ -f pyproject.toml ] || return 1
   python3 - <<'PY'
@@ -130,6 +131,7 @@ case "$version_source" in
       echo "version_command is required when version_source=command"
       exit 1
     fi
+    # Intentional: caller controls version_command via workflow input (trusted callers only)
     version="$(bash -c "$version_command" | head -n 1 | tr -d '\r')"
     ;;
   *)
