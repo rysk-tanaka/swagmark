@@ -34,7 +34,7 @@ jobs:
           # claude-implement ラベルは issue-implement.yml のトリガー。
           # 複数ラベルを同時付与すると concurrency の pending キャンセルで
           # 実装ワークフローが起動しないため、プロンプトで最後に付与するよう指示している。
-          claude_args: '--max-turns 15 --model claude-haiku-4-5 --allowed-tools "Write,Bash(gh issue list *),Bash(gh issue view *),Bash(gh issue comment * --body-file *),Bash(gh issue edit * --add-label *),Bash(gh label list *),Bash(gh label create *)"'
+          claude_args: '--max-turns 15 --model claude-sonnet-4-6 --allowed-tools "Write,Bash(gh issue list *),Bash(gh issue view *),Bash(gh issue comment * --body-file *),Bash(gh issue edit * --add-label *),Bash(gh label list *),Bash(gh label create *)"'
           prompt: |
             あなたは Issue トリアージ担当です。以下の手順に従ってください。
 
