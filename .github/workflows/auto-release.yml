@@ -129,6 +129,10 @@ jobs:
             exit 1
           fi
           MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          if [[ ! "$MAJOR" =~ ^[0-9]+$ ]]; then
+            echo "::error::Invalid major version: $MAJOR"
+            exit 1
+          fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "major=$MAJOR" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@v6
