@@ -14,12 +14,8 @@ permissions:
   contents: write
 
 jobs:
-  create-release:
+  validate-branch:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    outputs:
-      released: ${{ steps.release.outputs.released }}
     steps:
       # push は branches: [main] でフィルタ済みだが、workflow_dispatch 用に明示ガード
       - name: Validate branch
@@ -27,51 +23,17 @@ jobs:
         run: |
           echo "::error::このワークフローは main ブランチからのみ実行できます (現在: ${{ github.ref }})"
           exit 1
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
-      - name: Extract version
-        id: version
-        run: |
-          VERSION=$(jq -r '.version' package.json)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Create tag and release
-        id: release
-        run: |
-          TAG="${{ steps.version.outputs.tag }}"
-          CREATED=false
-
-          # Create tag if not exists
-          if git tag -l "$TAG" | grep -Fxq "$TAG"; then
-            echo "Tag $TAG already exists"
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git tag "$TAG"
-            git push origin "$TAG"
-            CREATED=true
-          fi
-
-          # Create release if not exists
-          if gh release view "$TAG" > /dev/null 2>&1; then
-            echo "Release $TAG already exists"
-          else
-            gh release create "$TAG" --generate-notes
-            CREATED=true
-          fi
-
-          # push trigger: only publish on new creation
-          # workflow_dispatch: also publish for existing releases (retry scenario)
-          if [[ "$CREATED" == "true" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "released=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "released=false" >> "$GITHUB_OUTPUT"
-          fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  create-release:
+    needs: validate-branch
+    permissions:
+      contents: write
+    uses: ./.github/workflows/release-on-version-change.yml
+    with:
+      version_source: package_json
+      tag_prefix: v
+      force_released_output: ${{ github.event_name == 'workflow_dispatch' }}
+    secrets: inherit
 
   update-major-tag:
     needs: create-release
