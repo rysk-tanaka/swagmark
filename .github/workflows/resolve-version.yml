@@ -14,7 +14,7 @@ on:
         default: VERSION
         type: string
       version_command:
-        description: "Shell command that prints version for command mode"
+        description: "Shell command that prints version (trusted callers only)"
         required: false
         default: ""
         type: string

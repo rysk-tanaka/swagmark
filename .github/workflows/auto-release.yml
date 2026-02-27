@@ -43,11 +43,13 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v6
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Update major version tag
         run: |
           MAJOR="v$(jq -r '.version' package.json | cut -d. -f1)"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag -f "$MAJOR"
           git push origin "$MAJOR" --force
 
