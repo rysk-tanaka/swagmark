@@ -130,7 +130,10 @@ markdownlint 抑制は二層構造で運用している。
 - `issue-implement.yml` — `claude-implement` ラベルが付与された open Issue を検知して Claude（opus）が自動実装。`implement-issue-{number}` ブランチ作成、コミット、PR 作成まで実行し、PR に `claude-review` ラベルを付与して `claude-code-review.yml` と連携。重複 PR ガード（本文のクローズキーワード + ブランチ名で判定）あり
 - `dependabot-scan.yml` — `workflow_dispatch` で手動実行。`pnpm audit` で脆弱性を検出し、シェルスクリプトが依存チェーンを分析して対応方針（`pnpm.overrides` 追加等）を Issue に起票。解消済み Issue は自動クローズ
 - ワークフロー共通規約 — git identity ステップ名は "Configure git identity"、`--allowed-tools` は最小権限（`Bash(git *)` や `Bash(pnpm *)` のようなワイルドカードは禁止、個別サブコマンドを指定）、ツール順序は `Read,Edit,Write,Glob,Grep` で統一
+- `--allowed-tools` のパターンマッチ制約 — `Bash(...)` 内の `*` は改行を跨げない。`--body` や `-m` に改行を含むコマンドはマッチしないため、`--body-file` で一時ファイル経由にするか、単一行に制限する必要がある。また `*` は前方一致ではなく、許可パターンにないフラグ（例: `-u`）が挟まるとマッチしない
 - claude-code-action を使うワークフローには `id-token: write` 権限が必須。`github_token` を明示指定しない場合、アクションは OIDC トークンを取得して Claude GitHub App のインストールトークンに交換する。`GITHUB_TOKEN` へのフォールバックはないため、この権限がないとアクション全体が失敗する
+- GitHub App トークンの `workflows` 権限制限 — OIDC 経由のインストールトークンでは `.github/workflows/` 配下のファイルを push できない。ワークフローファイルを変更する issue は自動実装の対象外
+- bot アクター連鎖と `allowed_bots` — issue-scan が `claude[bot]` としてラベル付与 → 後続ワークフローのトリガーアクターが bot になる。claude-code-action はデフォルトで bot アクターを拒否するため、連鎖するワークフローには `allowed_bots: "claude[bot]"` が必要
 - Issue 自動対応フロー — `issue-scan.yml`（scan）→ `issue-implement.yml`（implement）→ `claude-code-review.yml`（review）の順で処理
 - ラベル体系 — `claude-scanned` はトリアージ済みの印、`difficulty/*` は実装難易度（easy/medium/hard）、`claude-implement` は自動実装トリガー
 - `auto-release.yml` — `package.json` の version 変更を検知し、以下を一連で実行
