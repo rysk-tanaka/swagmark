@@ -41,6 +41,9 @@
 | [test.yml](./test.yml) | [ci-auto-fix.yml](./ci-auto-fix.yml) | `Test` が `failure` で完了した PR の head SHA を対象に自動修正 |
 | [issue-scan.yml](./issue-scan.yml) | [issue-implement.yml](./issue-implement.yml) | `claude-implement` ラベル付与で実装ワークフローを起動 |
 | [issue-implement.yml](./issue-implement.yml) | [claude-code-review.yml](./claude-code-review.yml) | PR 作成後に `claude-review` ラベル付与でレビューを起動 |
+| [auto-release.yml](./auto-release.yml) | [release-on-version-change.yml](./release-on-version-change.yml) | `workflow_call` でリリース処理を委譲 |
+| [release-on-version-change.yml](./release-on-version-change.yml) | [resolve-version.yml](./resolve-version.yml) | `workflow_call` でバージョン解決を委譲 |
+| [release-on-version-change.yml](./release-on-version-change.yml) | [release-core.yml](./release-core.yml) | `workflow_call` でタグ・Release 作成を委譲 |
 
 ## 依存アクション一覧
 

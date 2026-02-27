@@ -62,9 +62,18 @@ jobs:
 
           extract_from_pyproject() {
             [ -f pyproject.toml ] || return 1
-            grep -E '^version[[:space:]]*=' pyproject.toml \
-              | head -n 1 \
-              | sed -E 's/version[[:space:]]*=[[:space:]]*"([^"]+)"/\1/'
+            python3 - <<'PY'
+import tomllib
+from pathlib import Path
+
+data = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+version = (
+    data.get("project", {}).get("version")
+    or data.get("tool", {}).get("poetry", {}).get("version")
+)
+if version:
+    print(version)
+PY
           }
 
           extract_from_package_json() {
@@ -111,11 +120,11 @@ jobs:
               return 0
             fi
             if echo "$changed_files" | grep -Fxq "VERSION"; then
-              echo "version_file"
+              echo "version_file:VERSION"
               return 0
             fi
             if echo "$changed_files" | grep -Fxq ".release-version"; then
-              echo "version_file"
+              echo "version_file:.release-version"
               return 0
             fi
 
@@ -131,8 +140,12 @@ jobs:
               echo "cargo_toml"
               return 0
             fi
-            if [ -f VERSION ] || [ -f .release-version ]; then
-              echo "version_file"
+            if [ -f VERSION ]; then
+              echo "version_file:VERSION"
+              return 0
+            fi
+            if [ -f .release-version ]; then
+              echo "version_file:.release-version"
               return 0
             fi
 
@@ -145,9 +158,13 @@ jobs:
           tag_prefix="${INPUT_TAG_PREFIX:-v}"
 
           if [ "$version_source" = "auto" ]; then
-            if ! version_source="$(detect_source_from_changes)"; then
+            if ! detected="$(detect_source_from_changes)"; then
               echo "Could not detect version source automatically"
               exit 1
+            fi
+            version_source="${detected%%:*}"
+            if [ "$version_source" = "version_file" ] && [ "$detected" != "$version_source" ]; then
+              version_file="${detected#*:}"
             fi
           fi
 
@@ -172,7 +189,7 @@ jobs:
                 echo "version_command is required when version_source=command"
                 exit 1
               fi
-              version="$(eval "$version_command" | head -n 1 | tr -d '\r')"
+              version="$(bash -c "$version_command" | head -n 1 | tr -d '\r')"
               ;;
             *)
               echo "Unsupported version_source: $version_source"

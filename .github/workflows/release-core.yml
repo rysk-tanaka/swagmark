@@ -51,21 +51,33 @@ jobs:
           fetch-depth: 0
 
       - name: Validate tag input
+        env:
+          TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
-          TAG="${{ inputs.tag }}"
           if [ -z "$TAG" ]; then
             echo "tag input must not be empty"
             exit 1
           fi
+          if ! [[ "$TAG" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+            echo "tag contains invalid characters: $TAG"
+            exit 1
+          fi
+
+      - name: Configure git identity
+        if: inputs.create_tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Create tag if not exists
         id: tag_result
         if: inputs.create_tag
+        env:
+          TAG: ${{ inputs.tag }}
+          TAG_MESSAGE: ${{ inputs.tag_message }}
         run: |
           set -euo pipefail
-          TAG="${{ inputs.tag }}"
-          TAG_MESSAGE="${{ inputs.tag_message }}"
           TAG_CREATED=false
 
           if [ -z "$TAG_MESSAGE" ]; then
@@ -91,8 +103,6 @@ jobs:
             exit 0
           fi
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag -a "$TAG" -m "$TAG_MESSAGE"
           git push origin "refs/tags/$TAG"
           TAG_CREATED=true
@@ -103,9 +113,10 @@ jobs:
         id: release_result
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+          GENERATE_NOTES: ${{ inputs.generate_notes }}
         run: |
           set -euo pipefail
-          TAG="${{ inputs.tag }}"
           RELEASE_CREATED=false
 
           if gh release view "$TAG" > /dev/null 2>&1; then
@@ -114,7 +125,7 @@ jobs:
             exit 0
           fi
 
-          if [ "${{ inputs.generate_notes }}" = "true" ]; then
+          if [ "$GENERATE_NOTES" = "true" ]; then
             gh release create "$TAG" --generate-notes --verify-tag
           else
             gh release create "$TAG" --verify-tag
