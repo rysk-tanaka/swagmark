@@ -124,16 +124,15 @@ jobs:
             - コミットメッセージは英語で Conventional Commits 形式、単一行にする（HEREDOC やマルチライン不可）
             - PR 本文は `.github/pull_request_template.md` のテンプレートに従う（該当しないセクションは省略可）
 
-      - name: Notify failure to issue
-        if: failure() && steps.guard.outputs.skip != 'true'
+      - name: Post report to issue
+        if: always() && steps.guard.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          message=$(
-            cat <<EOF
-          自動実装に失敗しました。以下のワークフロー実行ログを確認してください。
-
-          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          EOF
-          )
-          gh issue comment "${{ github.event.issue.number }}" --body "$message"
+          if [ -s "$GITHUB_STEP_SUMMARY" ]; then
+            gh issue comment "${{ github.event.issue.number }}" \
+              --body-file "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ job.status }}" = "failure" ]; then
+            gh issue comment "${{ github.event.issue.number }}" \
+              --body "自動実装に失敗しました。${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi
