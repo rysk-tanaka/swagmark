@@ -32,6 +32,9 @@ jobs:
     with:
       version_source: package_json
       tag_prefix: v
+      # workflow_dispatch is a retry scenario: tag/release already exist but
+      # downstream publish jobs (npm, Docker, major tag) may have failed.
+      # Force released=true so those jobs run again.
       force_released_output: ${{ github.event_name == 'workflow_dispatch' }}
     secrets: inherit
 
