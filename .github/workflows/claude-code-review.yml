@@ -55,6 +55,11 @@ jobs:
             - [info] はインラインコメントにせず、サマリーの「その他の提案」セクションにまとめてください
             - 各インラインコメントの冒頭に `[critical]` または `[warning]` を明記してください
 
+            ## ツール使用上の注意
+
+            PR 情報（コミット SHA など）を取得する場合は `gh pr view ${{ github.event.pull_request.number }} --json headRefOid,baseRefOid` を使用してください。
+            `gh api ... | python3 ...` のようなパイプを含むコマンドは許可されていません。
+
             ## 重複コメント防止
 
             インラインコメントを作成する前に、まず `gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments` で既存のレビューコメントを確認してください。
