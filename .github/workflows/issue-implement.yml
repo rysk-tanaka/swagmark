@@ -137,7 +137,7 @@ jobs:
                 --body-file "$GITHUB_STEP_SUMMARY"
             else
               gh issue comment "${{ github.event.issue.number }}" \
-                --body "実装完了（サマリーが長すぎるため省略）。${RUN_URL}"
+                --body "実装レポート（サマリーが長すぎるため省略: ${{ job.status }}）。${RUN_URL}"
             fi
           elif [ "${{ job.status }}" = "failure" ]; then
             gh issue comment "${{ github.event.issue.number }}" \
