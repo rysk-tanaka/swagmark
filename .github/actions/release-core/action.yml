@@ -64,8 +64,6 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        # Early-exit paths write "tag_created=false" directly; this variable
-        # is only consumed on the success path (line: echo "tag_created=$TAG_CREATED").
         TAG_CREATED=false
 
         if [ -z "$TAG_MESSAGE" ]; then
@@ -92,9 +90,15 @@ runs:
         fi
 
         git tag -a "$TAG" -m "$TAG_MESSAGE"
-        git push origin "refs/tags/$TAG"
-        TAG_CREATED=true
-        echo "Created and pushed tag $TAG"
+        if git push origin "refs/tags/$TAG"; then
+          TAG_CREATED=true
+          echo "Created and pushed tag $TAG"
+        elif git ls-remote --tags origin "refs/tags/$TAG" | grep -Fq "refs/tags/$TAG"; then
+          echo "Tag $TAG was created by another run, skipping"
+        else
+          echo "::error::Failed to push tag $TAG"
+          exit 1
+        fi
         echo "tag_created=$TAG_CREATED" >> "$GITHUB_OUTPUT"
 
     - name: Create release
@@ -106,7 +110,6 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        # Same pattern as tag_result: early-exit writes literal, variable used on success only.
         RELEASE_CREATED=false
 
         if gh release view "$TAG" > /dev/null 2>&1; then
@@ -115,13 +118,20 @@ runs:
           exit 0
         fi
 
+        create_args=(--verify-tag)
         if [ "$GENERATE_NOTES" = "true" ]; then
-          gh release create "$TAG" --generate-notes --verify-tag
-        else
-          gh release create "$TAG" --verify-tag
+          create_args+=(--generate-notes)
         fi
-        RELEASE_CREATED=true
-        echo "Created release $TAG"
+
+        if gh release create "$TAG" "${create_args[@]}"; then
+          RELEASE_CREATED=true
+          echo "Created release $TAG"
+        elif gh release view "$TAG" > /dev/null 2>&1; then
+          echo "Release $TAG was created by another run, skipping"
+        else
+          echo "::error::Failed to create release $TAG"
+          exit 1
+        fi
         echo "release_created=$RELEASE_CREATED" >> "$GITHUB_OUTPUT"
 
     - name: Finalize outputs
