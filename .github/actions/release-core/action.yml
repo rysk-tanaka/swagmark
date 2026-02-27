@@ -64,6 +64,8 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
+        # Early-exit paths write "tag_created=false" directly; this variable
+        # is only consumed on the success path (line: echo "tag_created=$TAG_CREATED").
         TAG_CREATED=false
 
         if [ -z "$TAG_MESSAGE" ]; then
@@ -104,6 +106,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
+        # Same pattern as tag_result: early-exit writes literal, variable used on success only.
         RELEASE_CREATED=false
 
         if gh release view "$TAG" > /dev/null 2>&1; then

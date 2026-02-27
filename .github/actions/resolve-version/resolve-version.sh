@@ -47,6 +47,9 @@ extract_from_version_file() {
 
 detect_source_from_changes() {
   local changed_files
+  # Intentional: fall through to file-existence heuristic when git history is unavailable
+  # (e.g. shallow clone without GITHUB_SHA). The caller validates the extracted version,
+  # so a wrong source pick still fails safely.
   changed_files="$(git show --name-only --pretty='' "$GITHUB_SHA" || true)"
 
   if echo "$changed_files" | grep -Fxq "pyproject.toml"; then

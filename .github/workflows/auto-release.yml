@@ -121,6 +121,8 @@ jobs:
         id: version
         run: |
           set -euo pipefail
+          # Read from package.json directly (not workflow outputs) because
+          # MAJOR derivation via cut is needed anyway, keeping the logic self-contained.
           VERSION=$(jq -r '.version' package.json)
           if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
             echo "::error::Failed to extract version from package.json"
