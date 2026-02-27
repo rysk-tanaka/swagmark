@@ -41,10 +41,10 @@ on:
     outputs:
       version_source:
         description: "Resolved version source"
-        value: ${{ jobs.resolve-version.outputs.version_source }}
+        value: ${{ jobs.release.outputs.version_source }}
       version:
         description: "Resolved version"
-        value: ${{ jobs.resolve-version.outputs.version }}
+        value: ${{ jobs.release.outputs.version }}
       tag:
         description: "Release tag"
         value: ${{ jobs.release.outputs.tag }}
@@ -56,21 +56,29 @@ permissions:
   contents: write
 
 jobs:
-  resolve-version:
-    uses: ./.github/workflows/resolve-version.yml
-    with:
-      version_source: ${{ inputs.version_source }}
-      version_file: ${{ inputs.version_file }}
-      version_command: ${{ inputs.version_command }}
-      tag_prefix: ${{ inputs.tag_prefix }}
-
   release:
-    needs: resolve-version
-    uses: ./.github/workflows/release-core.yml
-    with:
-      tag: ${{ needs.resolve-version.outputs.tag }}
-      create_tag: ${{ inputs.create_tag }}
-      generate_notes: ${{ inputs.generate_notes }}
-      tag_message: Release ${{ needs.resolve-version.outputs.tag }}
-      force_released_output: ${{ inputs.force_released_output }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    outputs:
+      version_source: ${{ steps.resolve.outputs.version_source }}
+      version: ${{ steps.resolve.outputs.version }}
+      tag: ${{ steps.release.outputs.tag }}
+      released: ${{ steps.release.outputs.released }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/resolve-version
+        id: resolve
+        with:
+          version_source: ${{ inputs.version_source }}
+          version_file: ${{ inputs.version_file }}
+          version_command: ${{ inputs.version_command }}
+          tag_prefix: ${{ inputs.tag_prefix }}
+      - uses: ./.github/actions/release-core
+        id: release
+        with:
+          tag: ${{ steps.resolve.outputs.tag }}
+          create_tag: ${{ inputs.create_tag }}
+          generate_notes: ${{ inputs.generate_notes }}
+          tag_message: Release ${{ steps.resolve.outputs.tag }}
+          force_released_output: ${{ inputs.force_released_output }}

@@ -54,6 +54,10 @@ jobs:
         run: |
           set -euo pipefail
           MAJOR="v$(jq -r '.version' package.json | cut -d. -f1)"
+          if [[ ! "$MAJOR" =~ ^v[0-9]+$ ]]; then
+            echo "::error::Invalid major version tag: $MAJOR"
+            exit 1
+          fi
           git tag -f "$MAJOR"
           git push origin "$MAJOR" --force
 
@@ -116,8 +120,19 @@ jobs:
       - name: Extract version for tags
         id: version
         run: |
+          set -euo pipefail
+          # Read from package.json directly (not workflow outputs) because
+          # MAJOR derivation via cut is needed anyway, keeping the logic self-contained.
           VERSION=$(jq -r '.version' package.json)
+          if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
+            echo "::error::Failed to extract version from package.json"
+            exit 1
+          fi
           MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          if [[ ! "$MAJOR" =~ ^[0-9]+$ ]]; then
+            echo "::error::Invalid major version: $MAJOR"
+            exit 1
+          fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "major=$MAJOR" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@v6
