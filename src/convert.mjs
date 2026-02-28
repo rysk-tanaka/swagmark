@@ -14,17 +14,6 @@ import widdershins from "widdershins";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const httpMethods = new Set([
-  "get",
-  "post",
-  "put",
-  "delete",
-  "patch",
-  "head",
-  "options",
-  "trace",
-]);
-
 const badgeColors = {
   get: "blue",
   post: "green",
@@ -46,6 +35,8 @@ const badgeEmojis = {
   options: "⚪",
   trace: "⚪",
 };
+
+const httpMethods = new Set(Object.keys(badgeColors));
 
 function extractEndpoints(spec) {
   const endpoints = [];
