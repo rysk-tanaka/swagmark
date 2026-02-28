@@ -85,7 +85,9 @@ bin/cli.js (commander で引数パース)
   - JS スタイル: ダブルクォート、セミコロン必須、trailing comma あり、インデント 2 スペース、行幅 80
 - 主要依存: widdershins, commander, js-yaml
 - テンプレートエンジン: doT.js（widdershins 内蔵）
-- `pnpm.overrides` で `markdown-it` を `^14.1.0` に固定（widdershins の間接依存 `markdown-it@10` が Node.js 組み込み `punycode` を使用し非推奨警告が出るため）
+- `pnpm.overrides` で間接依存のバージョンを上書き
+  - `markdown-it: ^14.1.0` — widdershins の間接依存 `markdown-it@10` が Node.js 組み込み `punycode` を使用し非推奨警告が出るため
+  - `form-data: ^4.0.5` — widdershins > httpsnippet > form-data のセキュリティ脆弱性（GHSA-fjxv-7rqg-78g4）対応
 - GitHub Actions: actions/checkout@v6, actions/setup-node@v6（いずれも正式リリース済み）
   - pnpm キャッシュを使う場合、`corepack enable pnpm` を `actions/setup-node`（`cache: pnpm`）より前に実行する必要がある
 
