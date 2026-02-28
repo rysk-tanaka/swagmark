@@ -6,7 +6,7 @@ settings:
 
 overrides:
   markdown-it: ^14.1.0
-  form-data: '>=3.0.4'
+  form-data: '>=4.0.5'
 
 importers:
 
