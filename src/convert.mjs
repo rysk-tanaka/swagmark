@@ -25,12 +25,16 @@ const badgeColors = {
   trace: "lightgrey",
 };
 
+const emojiMap = {
+  get: "🔵",
+  post: "🟢",
+  put: "🟠",
+  delete: "🔴",
+  patch: "🟣",
+};
+
 const badgeEmojis = Object.fromEntries(
-  Object.keys(badgeColors).map((m) => [
-    m,
-    { get: "🔵", post: "🟢", put: "🟠", delete: "🔴", patch: "🟣" }[m] ||
-      "⚪",
-  ]),
+  Object.keys(badgeColors).map((m) => [m, emojiMap[m] ?? "⚪"]),
 );
 
 const httpMethods = new Set(Object.keys(badgeColors));
