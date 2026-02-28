@@ -14,17 +14,6 @@ import widdershins from "widdershins";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const httpMethods = [
-  "get",
-  "post",
-  "put",
-  "delete",
-  "patch",
-  "head",
-  "options",
-  "trace",
-];
-
 const badgeColors = {
   get: "blue",
   post: "green",
@@ -36,39 +25,31 @@ const badgeColors = {
   trace: "lightgrey",
 };
 
-const badgeEmojis = {
+const emojiMap = {
   get: "🔵",
   post: "🟢",
   put: "🟠",
   delete: "🔴",
   patch: "🟣",
-  head: "⚪",
-  options: "⚪",
-  trace: "⚪",
 };
+
+const badgeEmojis = Object.fromEntries(
+  Object.keys(badgeColors).map((m) => [m, emojiMap[m] ?? "⚪"]),
+);
+
+const httpMethods = new Set(Object.keys(badgeColors));
 
 function extractEndpoints(spec) {
   const endpoints = [];
   for (const [path, methods] of Object.entries(spec.paths || {})) {
     for (const [method, op] of Object.entries(methods)) {
-      if (
-        [
-          "get",
-          "post",
-          "put",
-          "delete",
-          "patch",
-          "head",
-          "options",
-          "trace",
-        ].includes(method)
-      ) {
+      if (httpMethods.has(method)) {
         endpoints.push({
           method: method.toUpperCase(),
           path,
           summary: op.summary || "",
-          color: badgeColors[method] || "lightgrey",
-          emoji: badgeEmojis[method] || "⚪",
+          color: badgeColors[method],
+          emoji: badgeEmojis[method],
         });
       }
     }
@@ -87,7 +68,7 @@ async function convertFile(file, inputDir, outputDir, templateDir) {
     Object.values(spec.paths || {})
       .flatMap((item) =>
         Object.entries(item)
-          .filter(([key]) => httpMethods.includes(key))
+          .filter(([key]) => httpMethods.has(key))
           .map(([, op]) => op),
       )
       .find((op) => op?.tags)?.tags?.[0] || name;
