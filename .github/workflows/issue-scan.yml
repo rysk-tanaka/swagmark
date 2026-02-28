@@ -30,11 +30,11 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          # max-turns 15: list(1) + per-issue view/label/comment(3-4) × 3件 ≈ 10-13
+          # max-turns 25: list(1) + per-issue view/write/comment/labels(5-7) × 3件 ≈ 16-22
           # claude-implement ラベルは issue-implement.yml のトリガー。
           # 複数ラベルを同時付与すると concurrency の pending キャンセルで
           # 実装ワークフローが起動しないため、プロンプトで最後に付与するよう指示している。
-          claude_args: '--max-turns 15 --model claude-sonnet-4-6 --allowed-tools "Write,Bash(gh issue list *),Bash(gh issue view *),Bash(gh issue comment * --body-file *),Bash(gh issue edit * --add-label *),Bash(gh label list *),Bash(gh label create *)"'
+          claude_args: '--max-turns 25 --model claude-sonnet-4-6 --allowed-tools "Write,Bash(gh issue list *),Bash(gh issue view *),Bash(gh issue comment * --body-file *),Bash(gh issue edit * --add-label *),Bash(gh label list *),Bash(gh label create *)"'
           prompt: |
             あなたは Issue トリアージ担当です。以下の手順に従ってください。
 
