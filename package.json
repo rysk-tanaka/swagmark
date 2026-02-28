@@ -48,7 +48,8 @@
   },
   "pnpm": {
     "overrides": {
-      "markdown-it": "^14.1.0"
+      "markdown-it": "^14.1.0",
+      "form-data": "^4.0.5"
     }
   },
   "devDependencies": {
