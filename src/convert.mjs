@@ -25,16 +25,13 @@ const badgeColors = {
   trace: "lightgrey",
 };
 
-const badgeEmojis = {
-  get: "🔵",
-  post: "🟢",
-  put: "🟠",
-  delete: "🔴",
-  patch: "🟣",
-  head: "⚪",
-  options: "⚪",
-  trace: "⚪",
-};
+const badgeEmojis = Object.fromEntries(
+  Object.keys(badgeColors).map((m) => [
+    m,
+    { get: "🔵", post: "🟢", put: "🟠", delete: "🔴", patch: "🟣" }[m] ||
+      "⚪",
+  ]),
+);
 
 const httpMethods = new Set(Object.keys(badgeColors));
 
@@ -47,8 +44,8 @@ function extractEndpoints(spec) {
           method: method.toUpperCase(),
           path,
           summary: op.summary || "",
-          color: badgeColors[method] || "lightgrey",
-          emoji: badgeEmojis[method] || "⚪",
+          color: badgeColors[method],
+          emoji: badgeEmojis[method],
         });
       }
     }
