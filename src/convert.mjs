@@ -106,7 +106,7 @@ function generateIndex(entries, outputDir) {
   const indexLines = [
     "# API Reference",
     "",
-    `> ${entries.length} セクション / ${entries.reduce((sum, e) => sum + e.endpoints.length, 0)} エンドポイント`,
+    `> ${entries.length} section(s) / ${entries.reduce((sum, e) => sum + e.endpoints.length, 0)} endpoint(s)`,
     "",
   ];
 

@@ -1,6 +1,6 @@
 # API Reference
 
-> 1 セクション / 3 エンドポイント
+> 1 section(s) / 3 endpoint(s)
 
 ## [pets](./petstore.md)
 
