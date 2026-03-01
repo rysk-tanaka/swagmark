@@ -53,3 +53,21 @@
 | `docker/setup-buildx-action` | `v3` | `auto-release.yml` |
 | `docker/login-action` | `v3` | `auto-release.yml` |
 | `docker/build-push-action` | `v6` | `auto-release.yml` |
+
+## claude-code-action の権限メモ
+
+`anthropics/claude-code-action` を使うワークフローの `permissions` 設定に関する注意事項。
+
+### 注意事項
+
+ソースコード（`src/github/token.ts`, `src/github/operations/comments/create-initial.ts`）上は、bot/ユーザー作成PRの区別なく常に OIDC 交換後の App トークンを使用する設計になっている。ただし、`issues: write` が不足していると `use_sticky_comment: true` のコメント投稿がサイレントに失敗することが確認されているため、必ず付与すること。
+
+### 必要な権限の対応表
+
+| 操作 | 必要な権限 |
+| --- | --- |
+| `use_sticky_comment: true`（PR へのサマリーコメント投稿） | `issues: write` |
+| PR review / インラインコメント投稿 | `pull-requests: write` |
+| コードの読み取り（checkout） | `contents: read` |
+| ファイル編集・push | `contents: write` |
+| OIDC トークン取得（必須） | `id-token: write` |

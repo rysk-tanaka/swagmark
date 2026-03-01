@@ -134,6 +134,7 @@ markdownlint 抑制は二層構造で運用している。
 - ワークフロー共通規約 — git identity ステップ名は "Configure git identity"、`--allowed-tools` は最小権限（`Bash(git *)` や `Bash(pnpm *)` のようなワイルドカードは禁止、個別サブコマンドを指定）、ツール順序は `Read,Edit,Write,Glob,Grep` で統一
 - `--allowed-tools` のパターンマッチ制約 — `Bash(...)` 内の `*` は改行を跨げない。`--body` や `-m` に改行を含むコマンドはマッチしないため、`--body-file` で一時ファイル経由にするか、単一行に制限する必要がある。また `*` は前方一致ではなく、許可パターンにないフラグ（例: `-u`）が挟まるとマッチしない
 - claude-code-action を使うワークフローには `id-token: write` 権限が必須。`github_token` を明示指定しない場合、アクションは OIDC トークンを取得して Claude GitHub App のインストールトークンに交換する。`GITHUB_TOKEN` へのフォールバックはないため、この権限がないとアクション全体が失敗する
+- `permissions` の write 指定 — `use_sticky_comment: true` を使う場合は `issues: write` を付与すること。ソースコード上はbot/ユーザーで認証フローに差はなく（常に OIDC 交換後の App トークンを使用）、不足しているとエラーにならずサイレントに失敗するので注意
 - GitHub App トークンの `workflows` 権限制限 — OIDC 経由のインストールトークンでは `.github/workflows/` 配下のファイルを push できない。ワークフローファイルを変更する issue は自動実装の対象外
 - bot アクター連鎖と `allowed_bots` — issue-scan が `claude[bot]` としてラベル付与 → 後続ワークフローのトリガーアクターが bot になる。claude-code-action はデフォルトで bot アクターを拒否するため、連鎖するワークフローには `allowed_bots: "claude[bot]"` が必要
 - Issue 自動対応フロー — `issue-scan.yml`（scan）→ `issue-implement.yml`（implement）→ `claude-code-review.yml`（review）の順で処理
