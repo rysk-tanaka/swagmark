@@ -126,7 +126,7 @@ else
       done
 
       # Convert >=X.Y.Z to ^X.Y.Z to limit overrides within the current major
-      override_range=$(echo "$patched_versions" | sed 's/^>=/^/')
+      override_range=$(echo "$patched_versions" | sed 's/>=/^/g')
 
       if [[ "$renovate_excluded_root" == "true" ]]; then
         if has_override "$module_name"; then
