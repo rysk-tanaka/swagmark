@@ -7,6 +7,9 @@ settings:
 overrides:
   markdown-it: ^14.1.0
   form-data: ^4.0.5
+  ajv: '>=6.14.0'
+  minimatch: ^10.2.1
+  jsonpointer: '>=5.0.0'
 
 importers:
 
@@ -530,9 +533,6 @@ packages:
     resolution: {integrity: sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
-  ajv@5.5.2:
-    resolution: {integrity: sha512-Ajr4IcMXq/2QmMkEmSvxqfLN5zGmJ92gHXAeOXq1OekoH2rfDNsgdDoL2f7QaRCy7G/E6TpxBVdRuNraMztGHw==}
-
   ajv@6.14.0:
     resolution: {integrity: sha512-IWrosm/yrn43eiKqkfkHis7QioDleaXQHdDVPKg0FSwwd/DuvyX79TZnFOnYpB7dcsFAMmtFztZuXPDvSePkFw==}
 
@@ -592,7 +592,7 @@ packages:
   better-ajv-errors@0.6.7:
     resolution: {integrity: sha512-PYgt/sCzR4aGpyNy5+ViSQ77ognMnWq7745zM+/flYO4/Yisdtp9wDQW2IKCyVYPUxQt3E/b5GBSwfhd1LPdlg==}
     peerDependencies:
-      ajv: 4.11.8 - 6
+      ajv: '>=6.14.0'
 
   brace-expansion@5.0.3:
     resolution: {integrity: sha512-fy6KJm2RawA5RcHkLa1z/ScpBeA762UF9KmZQxwIbDtRJrgLzM10depAiEQ+CXYcoiqW1/m96OAAoke2nE9EeA==}
@@ -647,10 +647,6 @@ packages:
   cliui@8.0.1:
     resolution: {integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==}
     engines: {node: '>=12'}
-
-  co@4.6.0:
-    resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}
-    engines: {iojs: '>= 1.0.0', node: '>= 0.12.0'}
 
   code-error-fragment@0.0.230:
     resolution: {integrity: sha512-cadkfKp6932H8UkhzE/gcUqhRMNf8jHzkAN7+5Myabswaghu4xABTgPHDCjW+dBAJxj/SpkTYokpzDqY4pCzQw==}
@@ -810,9 +806,6 @@ packages:
   expect-type@1.3.0:
     resolution: {integrity: sha512-knvyeauYhqjOYvQ66MznSMs83wmHrCycNEN6Ao+2AeYEfxUIkuiVxdEa1qlGEPK+We3n0THiDciYSsCcgW/DoA==}
     engines: {node: '>=12.0.0'}
-
-  fast-deep-equal@1.1.0:
-    resolution: {integrity: sha512-fueX787WZKCV0Is4/T2cyAdM4+x1S3MXXOAhavE1ys/W42SHAPacLTQhucja22QBYrfGw50M2sRiXPtTGv9Ymw==}
 
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
@@ -1088,9 +1081,6 @@ packages:
   json-pointer@0.6.2:
     resolution: {integrity: sha512-vLWcKbOaXlO+jvRy4qNd+TI1QUPZzfJj1tpJ3vAXDych5XJf93ftpUKe5pKCrzyIIwgBJcOcCVRUfqQP25afBw==}
 
-  json-schema-traverse@0.3.1:
-    resolution: {integrity: sha512-4JD/Ivzg7PoW8NzdrBSr3UFwC9mHgvI7Z6z3QGBsSHgKaRTUDmyZAAKJo2UbG1kUVfS9WS8bi36N49U1xw43DA==}
-
   json-schema-traverse@0.4.1:
     resolution: {integrity: sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==}
 
@@ -1101,8 +1091,8 @@ packages:
   jsonc-parser@3.3.1:
     resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
 
-  jsonpointer@4.1.0:
-    resolution: {integrity: sha512-CXcRvMyTlnR53xMcKnuMzfCA5i/nfblTnnr74CZb6C4vG39eu6w51t7nKmU5MfLfbTgGItliNyjO/ciNPDqClg==}
+  jsonpointer@5.0.1:
+    resolution: {integrity: sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ==}
     engines: {node: '>=0.10.0'}
 
   katex@0.16.33:
@@ -1287,9 +1277,9 @@ packages:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}
     engines: {node: '>=6'}
 
-  minimatch@9.0.6:
-    resolution: {integrity: sha512-kQAVowdR33euIqeA0+VZTDqU+qo1IeVY+hrKYtZMio3Pg0P0vuh/kwRylLUddJhB6pf3q/botcOvRtx4IN1wqQ==}
-    engines: {node: '>=16 || 14 >=14.17'}
+  minimatch@10.2.4:
+    resolution: {integrity: sha512-oRjTw/97aTBN0RHbYCdtF1MQfvusSIBQM0IZEgzl6426+8jSC0nF1a/GmnVLpfB9yyr6g6FTqWqiZVbxrtaCIg==}
+    engines: {node: 18 || 20 || >=22}
 
   minipass@7.1.3:
     resolution: {integrity: sha512-tEBHqDnIoM/1rXME1zgka9g6Q2lcoCkxHLuc7ODJ5BxbP5d4c2Z5cGgtXAku59200Cx7diuHTOYfSBD8n6mm8A==}
@@ -2224,13 +2214,6 @@ snapshots:
 
   abbrev@2.0.0: {}
 
-  ajv@5.5.2:
-    dependencies:
-      co: 4.6.0
-      fast-deep-equal: 1.1.0
-      fast-json-stable-stringify: 2.1.0
-      json-schema-traverse: 0.3.1
-
   ajv@6.14.0:
     dependencies:
       fast-deep-equal: 3.1.3
@@ -2274,17 +2257,6 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  better-ajv-errors@0.6.7(ajv@5.5.2):
-    dependencies:
-      '@babel/code-frame': 7.29.0
-      '@babel/runtime': 7.28.6
-      ajv: 5.5.2
-      chalk: 2.4.2
-      core-js: 3.48.0
-      json-to-ast: 2.1.0
-      jsonpointer: 4.1.0
-      leven: 3.1.0
-
   better-ajv-errors@0.6.7(ajv@6.14.0):
     dependencies:
       '@babel/code-frame': 7.29.0
@@ -2293,7 +2265,7 @@ snapshots:
       chalk: 2.4.2
       core-js: 3.48.0
       json-to-ast: 2.1.0
-      jsonpointer: 4.1.0
+      jsonpointer: 5.0.1
       leven: 3.1.0
 
   brace-expansion@5.0.3:
@@ -2357,8 +2329,6 @@ snapshots:
       string-width: 4.2.3
       strip-ansi: 6.0.1
       wrap-ansi: 7.0.0
-
-  co@4.6.0: {}
 
   code-error-fragment@0.0.230: {}
 
@@ -2524,8 +2494,6 @@ snapshots:
 
   expect-type@1.3.0: {}
 
-  fast-deep-equal@1.1.0: {}
-
   fast-deep-equal@3.1.3: {}
 
   fast-glob@3.3.3:
@@ -2636,7 +2604,7 @@ snapshots:
     dependencies:
       foreground-child: 3.3.1
       jackspeak: 3.4.3
-      minimatch: 9.0.6
+      minimatch: 10.2.4
       minipass: 7.1.3
       package-json-from-dist: 1.0.1
       path-scurry: 1.11.1
@@ -2787,8 +2755,6 @@ snapshots:
     dependencies:
       foreach: 2.0.6
 
-  json-schema-traverse@0.3.1: {}
-
   json-schema-traverse@0.4.1: {}
 
   json-to-ast@2.1.0:
@@ -2798,7 +2764,7 @@ snapshots:
 
   jsonc-parser@3.3.1: {}
 
-  jsonpointer@4.1.0: {}
+  jsonpointer@5.0.1: {}
 
   katex@0.16.33:
     dependencies:
@@ -3103,7 +3069,7 @@ snapshots:
 
   mimic-fn@2.1.0: {}
 
-  minimatch@9.0.6:
+  minimatch@10.2.4:
     dependencies:
       brace-expansion: 5.0.3
 
@@ -3178,8 +3144,8 @@ snapshots:
 
   oas-validator@4.0.8:
     dependencies:
-      ajv: 5.5.2
-      better-ajv-errors: 0.6.7(ajv@5.5.2)
+      ajv: 6.14.0
+      better-ajv-errors: 0.6.7(ajv@6.14.0)
       call-me-maybe: 1.0.2
       oas-kit-common: 1.0.8
       oas-linter: 3.2.2

@@ -88,6 +88,9 @@ bin/cli.js (commander で引数パース)
 - `pnpm.overrides` で間接依存のバージョンを上書き
   - `markdown-it: ^14.1.0` — widdershins の間接依存 `markdown-it@10` が Node.js 組み込み `punycode` を使用し非推奨警告が出るため
   - `form-data: ^4.0.5` — widdershins > httpsnippet > form-data のセキュリティ脆弱性（GHSA-fjxv-7rqg-78g4）対応
+  - `ajv: >=6.14.0` — widdershins > swagger2openapi > oas-validator > ajv の ReDoS 脆弱性（GHSA-2g4f-4pwh-qvx6）対応
+  - `minimatch: ^10.2.1` — license-checker-rseidelsohn > read-installed-packages > read-package-json > glob > minimatch の ReDoS 脆弱性（GHSA-3ppc-4f35-3m26）対応
+  - `jsonpointer: >=5.0.0` — widdershins > swagger2openapi > better-ajv-errors > jsonpointer の Prototype Pollution 脆弱性（GHSA-282f-qqgm-c34q）対応
 - GitHub Actions: actions/checkout@v6, actions/setup-node@v6（いずれも正式リリース済み）
   - pnpm キャッシュを使う場合、`corepack enable pnpm` を `actions/setup-node`（`cache: pnpm`）より前に実行する必要がある
 
