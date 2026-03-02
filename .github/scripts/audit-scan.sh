@@ -125,11 +125,17 @@ else
         fi
       done
 
-      # Convert >=X.Y.Z to ^X.Y.Z to limit overrides within the current major.
-      # Note: for 0.x packages, ^ narrows the range (e.g. ^0.7.0 = <0.8.0),
-      # which may exclude valid patched versions. Currently all indirect deps
-      # in this project are major >= 1, so this is acceptable.
-      override_range=$(echo "$patched_versions" | sed 's/>=/^/g')
+      # Convert a simple ">=X.Y.Z" (major>=1) to "^X.Y.Z" to limit overrides
+      # within the current major. For compound ranges (e.g. ">=1.2.3 <2.0.0
+      # || >=3.0.0") or 0.x packages, keep patched_versions as-is to avoid
+      # generating invalid semver or overly narrow ranges.
+      override_range="$patched_versions"
+      if [[ "$patched_versions" =~ ^">="([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+        major="${BASH_REMATCH[1]}"
+        if (( major >= 1 )); then
+          override_range="^${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+        fi
+      fi
 
       if [[ "$renovate_excluded_root" == "true" ]]; then
         if has_override "$module_name"; then
