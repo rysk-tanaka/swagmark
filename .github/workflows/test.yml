@@ -40,7 +40,7 @@ jobs:
             echo "Updating pnpm-lock.yaml..."
             git add pnpm-lock.yaml
             git commit -m "chore: auto-update pnpm-lock.yaml"
-            git push origin HEAD
+            git push origin "HEAD:${{ github.head_ref }}"
           else
             echo "pnpm-lock.yaml is up to date"
           fi
