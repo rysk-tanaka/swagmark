@@ -125,11 +125,23 @@ else
         fi
       done
 
+      # Convert a simple ">=X.Y.Z" (major>=1) to "^X.Y.Z" to limit overrides
+      # within the current major. For compound ranges (e.g. ">=1.2.3 <2.0.0
+      # || >=3.0.0") or 0.x packages, keep patched_versions as-is to avoid
+      # generating invalid semver or overly narrow ranges.
+      override_range="$patched_versions"
+      if [[ "$patched_versions" =~ ^">="([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+        major="${BASH_REMATCH[1]}"
+        if (( major >= 1 )); then
+          override_range="^${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+        fi
+      fi
+
       if [[ "$renovate_excluded_root" == "true" ]]; then
         if has_override "$module_name"; then
-          recommendation="既に \`pnpm.overrides\` にエントリがあります。\`package.json\` の \`pnpm.overrides[\"${module_name}\"]\` のバージョン範囲を \`${patched_versions}\` に更新してください。"
+          recommendation="既に \`pnpm.overrides\` にエントリがあります。\`package.json\` の \`pnpm.overrides[\"${module_name}\"]\` のバージョン範囲を \`${override_range}\` に更新してください。"
         else
-          recommendation="ルート依存（${root_deps}）が Renovate の自動更新対象外のため、\`pnpm.overrides\` に \`\"${module_name}\": \"${patched_versions}\"\` を追加してください。"
+          recommendation="ルート依存（${root_deps}）が Renovate の自動更新対象外のため、\`pnpm.overrides\` に \`\"${module_name}\": \"${override_range}\"\` を追加してください。"
         fi
       else
         recommendation="Renovate による自動更新で修正される見込みです。ルート依存（${root_deps}）の更新 PR をお待ちください。"
