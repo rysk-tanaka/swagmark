@@ -7,9 +7,9 @@ settings:
 overrides:
   markdown-it: ^14.1.0
   form-data: ^4.0.5
-  ajv: '>=6.14.0'
+  ajv: ^6.14.0
   minimatch: ^10.2.1
-  jsonpointer: '>=5.0.0'
+  jsonpointer: ^5.0.0
 
 importers:
 
@@ -592,7 +592,7 @@ packages:
   better-ajv-errors@0.6.7:
     resolution: {integrity: sha512-PYgt/sCzR4aGpyNy5+ViSQ77ognMnWq7745zM+/flYO4/Yisdtp9wDQW2IKCyVYPUxQt3E/b5GBSwfhd1LPdlg==}
     peerDependencies:
-      ajv: '>=6.14.0'
+      ajv: ^6.14.0
 
   brace-expansion@5.0.3:
     resolution: {integrity: sha512-fy6KJm2RawA5RcHkLa1z/ScpBeA762UF9KmZQxwIbDtRJrgLzM10depAiEQ+CXYcoiqW1/m96OAAoke2nE9EeA==}
