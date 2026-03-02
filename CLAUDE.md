@@ -124,8 +124,7 @@ markdownlint 抑制は二層構造で運用している。
 ## CI/CD
 
 - `lint.yml` — push / PR で Biome（`biomejs/setup-biome@v2` で `pnpm install` 不要）と markdownlint（`lint-md` ジョブ）を自動実行
-- `test.yml` — push / PR で `pnpm test` を自動実行
-- `update-lockfile.yml` — PR で `pnpm-lock.yaml` が `package.json` と未同期の場合に自動更新してプッシュ。レビューサジェスト採用時のロックファイル不整合を解消する。プッシュにより test.yml / lint.yml が再トリガーされる
+- `test.yml` — push / PR で `pnpm test` を自動実行。PR 時は `update-lockfile` ジョブが先行し、`pnpm-lock.yaml` の未同期を検出・自動更新する（`--lockfile-only --ignore-scripts` で再生成、`needs` で test ジョブを依存させる devtools-release-notifier パターン）
 - `ci-auto-fix.yml` — "Test" ワークフロー失敗時に Claude が自動修正して PR ブランチにプッシュ（再帰防止: 直前コミットが `github-actions[bot]` ならスキップ）
 - `claude.yml` — `@claude` メンションへの応答ワークフロー。`issue_comment`、`pull_request_review_comment`、`issues`、`pull_request_review` をトリガーに Claude Code を実行
 - `claude-code-review.yml` — `claude-review` ラベル付き PR の自動コードレビュー（claude-code-action、オプトイン方式）

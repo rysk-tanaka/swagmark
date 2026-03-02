@@ -7,8 +7,7 @@
 | Workflow | Status | 主目的 | トリガー | 依存アクション |
 | --- | --- | --- | --- | --- |
 | [lint.yml](./lint.yml) | [![Lint](https://github.com/rysk-tanaka/swagmark/actions/workflows/lint.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/lint.yml) | Biome と markdownlint の実行 | `push` (main), `pull_request` (main) | `actions/checkout@v6`, `biomejs/setup-biome@v2`, `actions/setup-node@v6` |
-| [test.yml](./test.yml) | [![Test](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml) | テスト実行 | `push` (main), `pull_request` (main) | `actions/checkout@v6`, `actions/setup-node@v6` |
-| [update-lockfile.yml](./update-lockfile.yml) | [![Update lockfile](https://github.com/rysk-tanaka/swagmark/actions/workflows/update-lockfile.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/update-lockfile.yml) | PR で `pnpm-lock.yaml` が未同期なら自動更新 | `pull_request` (main) | `actions/checkout@v6`, `actions/setup-node@v6` |
+| [test.yml](./test.yml) | [![Test](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml) | テスト実行 + PR 時のロックファイル自動更新 | `push` (main), `pull_request` (main) | `actions/checkout@v6`, `actions/setup-node@v6` |
 | [ci-auto-fix.yml](./ci-auto-fix.yml) | [![Auto Fix CI](https://github.com/rysk-tanaka/swagmark/actions/workflows/ci-auto-fix.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/ci-auto-fix.yml) | Test 失敗時の自動修正 | `workflow_run` (`Test` completed) | `actions/checkout@v6`, `actions/setup-node@v6`, `actions/github-script@v8`, `anthropics/claude-code-action@v1` |
 
 ## リリースと配布
@@ -37,7 +36,6 @@
 
 | From | To | 連携条件 |
 | --- | --- | --- |
-| [update-lockfile.yml](./update-lockfile.yml) | [test.yml](./test.yml), [lint.yml](./lint.yml) | lockfile 更新 push で PR ワークフローが再トリガー |
 | [test.yml](./test.yml) | [ci-auto-fix.yml](./ci-auto-fix.yml) | `Test` が `failure` で完了した PR の head SHA を対象に自動修正 |
 | [issue-scan.yml](./issue-scan.yml) | [issue-implement.yml](./issue-implement.yml) | `claude-implement` ラベル付与で実装ワークフローを起動 |
 | [issue-implement.yml](./issue-implement.yml) | [claude-code-review.yml](./claude-code-review.yml) | PR 作成後に `claude-review` ラベル付与でレビューを起動 |
@@ -47,8 +45,8 @@
 
 | Action | 採用バージョン | 利用 workflow |
 | --- | --- | --- |
-| `actions/checkout` | `v6` | `auto-release.yml`, `ci-auto-fix.yml`, `claude-code-review.yml`, `claude.yml`, `dependabot-scan.yml`, `issue-implement.yml`, `issue-scan.yml`, `lint.yml`, `release-on-version-change.yml`, `test.yml`, `update-lockfile.yml` |
-| `actions/setup-node` | `v6` | `auto-release.yml`, `ci-auto-fix.yml`, `dependabot-scan.yml`, `issue-implement.yml`, `lint.yml`, `test.yml`, `update-lockfile.yml` |
+| `actions/checkout` | `v6` | `auto-release.yml`, `ci-auto-fix.yml`, `claude-code-review.yml`, `claude.yml`, `dependabot-scan.yml`, `issue-implement.yml`, `issue-scan.yml`, `lint.yml`, `release-on-version-change.yml`, `test.yml` |
+| `actions/setup-node` | `v6` | `auto-release.yml`, `ci-auto-fix.yml`, `dependabot-scan.yml`, `issue-implement.yml`, `lint.yml`, `test.yml` |
 | `biomejs/setup-biome` | `v2` | `lint.yml` |
 | `actions/github-script` | `v8` | `ci-auto-fix.yml`, `issue-implement.yml` |
 | `anthropics/claude-code-action` | `v1` | `ci-auto-fix.yml`, `claude-code-review.yml`, `claude.yml`, `issue-implement.yml`, `issue-scan.yml` |
