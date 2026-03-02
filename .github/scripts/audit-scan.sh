@@ -125,7 +125,10 @@ else
         fi
       done
 
-      # Convert >=X.Y.Z to ^X.Y.Z to limit overrides within the current major
+      # Convert >=X.Y.Z to ^X.Y.Z to limit overrides within the current major.
+      # Note: for 0.x packages, ^ narrows the range (e.g. ^0.7.0 = <0.8.0),
+      # which may exclude valid patched versions. Currently all indirect deps
+      # in this project are major >= 1, so this is acceptable.
       override_range=$(echo "$patched_versions" | sed 's/>=/^/g')
 
       if [[ "$renovate_excluded_root" == "true" ]]; then
