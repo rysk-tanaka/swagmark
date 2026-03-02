@@ -7,7 +7,7 @@
 | Workflow | Status | 主目的 | トリガー | 依存アクション |
 | --- | --- | --- | --- | --- |
 | [lint.yml](./lint.yml) | [![Lint](https://github.com/rysk-tanaka/swagmark/actions/workflows/lint.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/lint.yml) | Biome と markdownlint の実行 | `push` (main), `pull_request` (main) | `actions/checkout@v6`, `biomejs/setup-biome@v2`, `actions/setup-node@v6` |
-| [test.yml](./test.yml) | [![Test](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml) | テスト実行 | `push` (main), `pull_request` (main) | `actions/checkout@v6`, `actions/setup-node@v6` |
+| [test.yml](./test.yml) | [![Test](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/test.yml) | テスト実行 + PR 時のロックファイル自動更新 | `push` (main), `pull_request` (main) | `actions/checkout@v6`, `actions/setup-node@v6` |
 | [ci-auto-fix.yml](./ci-auto-fix.yml) | [![Auto Fix CI](https://github.com/rysk-tanaka/swagmark/actions/workflows/ci-auto-fix.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/ci-auto-fix.yml) | Test 失敗時の自動修正 | `workflow_run` (`Test` completed) | `actions/checkout@v6`, `actions/setup-node@v6`, `actions/github-script@v8`, `anthropics/claude-code-action@v1` |
 
 ## リリースと配布
