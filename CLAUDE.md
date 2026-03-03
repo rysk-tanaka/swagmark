@@ -91,6 +91,7 @@ bin/cli.js (commander で引数パース)
   - `ajv: ^6.14.0` — widdershins > swagger2openapi > oas-validator > ajv の ReDoS 脆弱性（GHSA-2g4f-4pwh-qvx6）対応
   - `minimatch: ^10.2.1` — license-checker-rseidelsohn > read-installed-packages > read-package-json > glob > minimatch の ReDoS 脆弱性（GHSA-3ppc-4f35-3m26）対応
   - `jsonpointer: ^5.0.0` — widdershins > swagger2openapi > better-ajv-errors > jsonpointer の Prototype Pollution 脆弱性（GHSA-282f-qqgm-c34q）対応
+  - `fast-xml-parser: ^5.3.8` — widdershins > openapi-sampler > fast-xml-parser の Stack Overflow 脆弱性（GHSA-fj3w-jwp8-x2g3）対応
 - GitHub Actions: actions/checkout@v6, actions/setup-node@v6（いずれも正式リリース済み）
   - pnpm キャッシュを使う場合、`corepack enable pnpm` を `actions/setup-node`（`cache: pnpm`）より前に実行する必要がある
 
