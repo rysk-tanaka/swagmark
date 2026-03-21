@@ -5,48 +5,4 @@ on:
 
 jobs:
   scan:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    concurrency:
-      group: dependabot-scan
-      cancel-in-progress: false
-    permissions:
-      contents: read
-      issues: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-
-      - name: Enable pnpm via corepack
-        run: corepack enable pnpm
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run pnpm audit
-        run: pnpm audit --json > audit-result.json || true
-
-      # pnpm audit --json outputs the npm v6 advisory format (.advisories key)
-      # as of pnpm v10. Verified locally; if a future pnpm version switches to
-      # auditReportVersion 2 (.vulnerabilities key), this check will catch it.
-      - name: Verify audit output
-        run: |
-          if ! jq -e '.advisories' audit-result.json > /dev/null 2>&1; then
-            echo "::error::pnpm audit produced invalid output"
-            cat audit-result.json
-            exit 1
-          fi
-
-      - name: Scan and create issues
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash .github/scripts/audit-scan.sh audit-result.json
+    uses: rysk-tanaka/workflows/.github/workflows/dependabot-scan.yml@main

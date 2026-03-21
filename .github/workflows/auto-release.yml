@@ -28,7 +28,7 @@ jobs:
     needs: validate-branch
     permissions:
       contents: write
-    uses: ./.github/workflows/release-on-version-change.yml
+    uses: rysk-tanaka/workflows/.github/workflows/release-on-version-change.yml@main
     with:
       version_source: package_json
       tag_prefix: v

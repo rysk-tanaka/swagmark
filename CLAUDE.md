@@ -126,14 +126,29 @@ markdownlint 抑制は二層構造で運用している。
 
 ## CI/CD
 
+汎用ワークフローとアクションは `rysk-tanaka/workflows` リポジトリに移設済み。各ワークフローは薄いラッパーとして外部の reusable workflow を呼び出す。
+
+### ローカルワークフロー（swagmark 固有）
+
 - `lint.yml` — push / PR で Biome（`biomejs/setup-biome@v2` で `pnpm install` 不要）と markdownlint（`lint-md` ジョブ）を自動実行
 - `test.yml` — push / PR で `pnpm test` を自動実行。PR 時は `update-lockfile` ジョブが先行し、`pnpm-lock.yaml` の未同期を検出・自動更新する（`--lockfile-only --ignore-scripts` で再生成、`needs` で test ジョブを依存させる devtools-release-notifier パターン）
 - `ci-auto-fix.yml` — "Test" ワークフロー失敗時に Claude が自動修正して PR ブランチにプッシュ（再帰防止: 直前コミットが `github-actions[bot]` ならスキップ）
-- `claude.yml` — `@claude` メンションへの応答ワークフロー。`issue_comment`、`pull_request_review_comment`、`issues`、`pull_request_review` をトリガーに Claude Code を実行
+- `auto-release.yml` — `package.json` の version 変更を検知し、`rysk-tanaka/workflows` の reusable workflow 経由でリリースを実行。publish 系ジョブ（major tag、npm、Docker）のオーケストレーション
+  - メジャーバージョンタグ (`v0`) の更新 — `vars.PUBLISH_ACTION == 'true'` で有効化
+  - npm レジストリへの公開 — `vars.PUBLISH_NPM == 'true'` + `NPM_TOKEN` シークレットで有効化
+  - Docker イメージの GHCR への push — `vars.PUBLISH_DOCKER == 'true'` で有効化
+  - `workflow_dispatch` で手動再実行にも対応（既存タグは安全にスキップ）
+
+### ラッパーワークフロー（外部 reusable workflow を呼び出し）
+
+- `claude.yml` — `@claude` メンションへの応答。トリガーと `if` 条件を caller 側に残し、共通ロジックは `rysk-tanaka/workflows` に委譲
 - `claude-code-review.yml` — `claude-review` ラベル付き PR の自動コードレビュー（claude-code-action、オプトイン方式）
 - `issue-scan.yml` — 日次 cron（09:50 JST / 00:50 UTC）+ `workflow_dispatch` で open issue をトリアージ。claude-sonnet-4-6 で難易度判定（easy/medium/hard）し、ラベル付与とコメントを行う。easy は `claude-implement` ラベルを付与して自動実装ワークフローに連携
-- `issue-implement.yml` — `claude-implement` ラベルが付与された open Issue を検知して Claude（opus）が自動実装。`implement-issue-{number}` ブランチ作成、コミット、PR 作成まで実行し、PR に `claude-review` ラベルを付与して `claude-code-review.yml` と連携。重複 PR ガード（本文のクローズキーワード + ブランチ名で判定）あり
-- `dependabot-scan.yml` — `workflow_dispatch` で手動実行。`pnpm audit` で脆弱性を検出し、シェルスクリプトが依存チェーンを分析して対応方針（`pnpm.overrides` 追加等）を Issue に起票。解消済み Issue は自動クローズ
+- `issue-implement.yml` — `claude-implement` ラベルが付与された open Issue を検知して Claude（opus）が自動実装。`claude_args` と `prompt` を caller 側で全文指定する設計（`--allowed-tools` のパターンマッチが厳密なため）
+- `dependabot-scan.yml` — `workflow_dispatch` で手動実行。`pnpm audit` で脆弱性を検出し Issue を起票
+
+### ワークフロー共通規約
+
 - ワークフロー共通規約 — git identity ステップ名は "Configure git identity"、`--allowed-tools` は最小権限（`Bash(git *)` や `Bash(pnpm *)` のようなワイルドカードは禁止、個別サブコマンドを指定）、ツール順序は `Read,Edit,Write,Glob,Grep` で統一
 - `--allowed-tools` のパターンマッチ制約 — `Bash(...)` 内の `*` は改行を跨げない。`--body` や `-m` に改行を含むコマンドはマッチしないため、`--body-file` で一時ファイル経由にするか、単一行に制限する必要がある。また `*` は前方一致ではなく、許可パターンにないフラグ（例: `-u`）が挟まるとマッチしない
 - claude-code-action を使うワークフローには `id-token: write` 権限が必須。`github_token` を明示指定しない場合、アクションは OIDC トークンを取得して Claude GitHub App のインストールトークンに交換する。`GITHUB_TOKEN` へのフォールバックはないため、この権限がないとアクション全体が失敗する
@@ -142,14 +157,8 @@ markdownlint 抑制は二層構造で運用している。
 - bot アクター連鎖と `allowed_bots` — issue-scan が `claude[bot]` としてラベル付与 → 後続ワークフローのトリガーアクターが bot になる。claude-code-action はデフォルトで bot アクターを拒否するため、連鎖するワークフローには `allowed_bots: "claude[bot]"` が必要
 - Issue 自動対応フロー — `issue-scan.yml`（scan）→ `issue-implement.yml`（implement）→ `claude-code-review.yml`（review）の順で処理
 - ラベル体系 — `claude-scanned` はトリアージ済みの印、`difficulty/*` は実装難易度（easy/medium/hard）、`claude-implement` は自動実装トリガー
-- `auto-release.yml` — `package.json` の version 変更を検知し、再利用可能ワークフロー経由でリリースを実行。publish 系ジョブ（major tag、npm、Docker）のオーケストレーション
-  - メジャーバージョンタグ (`v0`) の更新 — `vars.PUBLISH_ACTION == 'true'` で有効化
-  - npm レジストリへの公開 — `vars.PUBLISH_NPM == 'true'` + `NPM_TOKEN` シークレットで有効化
-  - Docker イメージの GHCR への push — `vars.PUBLISH_DOCKER == 'true'` で有効化
-  - `workflow_dispatch` で手動再実行にも対応（既存タグは安全にスキップ）
-- `release-on-version-change.yml` — `workflow_call` 専用。バージョン解決 → タグ作成 → Release 作成を1ジョブで実行するオーケストレーション層。内部で composite action（`.github/actions/resolve-version`、`.github/actions/release-core`）を使用
-- `.github/actions/resolve-version/` — composite action。package.json / pyproject.toml / Cargo.toml / VERSION ファイル / 任意コマンドからバージョンを自動検出。ロジックは `resolve-version.sh` に分離
-- `.github/actions/release-core/` — composite action。タグ作成と GitHub Release 作成（冪等性を考慮した既存タグ/リリースのスキップ付き）
+- `permissions` は caller 側にも明示する（reusable workflow の permissions と交差されるため）
+- `secrets: inherit` ではなく明示的に `secrets:` で渡す（可読性・安全性）
 
 リリースフロー: version bump → push to main → auto-release → release-on-version-change（resolve-version action → release-core action）→ publish
 
