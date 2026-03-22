@@ -7,6 +7,10 @@
   "schedule": ["before 9am on saturday"],
   "packageRules": [
     {
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
       "description": "Last release 4.0.1 (2020); custom templates and markdown-it override require manual compatibility checks",
       "matchDepNames": ["widdershins"],
       "enabled": false
