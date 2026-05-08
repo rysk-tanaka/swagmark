@@ -37,7 +37,7 @@
     "type": "git",
     "url": "https://github.com/rysk-tanaka/swagmark.git"
   },
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@10.33.4",
   "engines": {
     "node": ">=20"
   },
