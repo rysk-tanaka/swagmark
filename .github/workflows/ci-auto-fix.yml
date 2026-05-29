@@ -91,7 +91,7 @@ jobs:
 
       - name: Fix CI failures with Claude
         if: steps.guard.outputs.skip != 'true'
-        uses: anthropics/claude-code-action@4481e6d3c7bbb88db2a928ca3444c536f589c7c1 # v1.0.131
+        uses: anthropics/claude-code-action@787c5a0ce96a9a6cfb050ea0c8f4c05f2447c251 # v1.0.133
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: '--model claude-sonnet-4-6 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git add *),Bash(git commit *),Bash(git push origin *),Bash(git status *),Bash(git diff *),Bash(pnpm test),Bash(pnpm test *),Bash(gh pr comment *),Bash(gh pr view *)"'
