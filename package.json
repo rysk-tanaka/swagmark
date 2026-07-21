@@ -60,7 +60,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.4",
     "@vitest/coverage-v8": "^4.0.0",
-    "license-checker-rseidelsohn": "^4.4.2",
+    "license-checker-rseidelsohn": "^5.0.0",
     "markdownlint-cli2": "^0.23.0",
     "vitest": "^4.0.0"
   }
