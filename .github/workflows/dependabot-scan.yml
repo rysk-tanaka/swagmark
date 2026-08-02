@@ -5,4 +5,4 @@ on:
 
 jobs:
   scan:
-    uses: rysk-tanaka/workflows/.github/workflows/dependabot-scan.yml@main
+    uses: rysk-tanaka/workflows/.github/workflows/dependabot-scan.yml@bfb50f6c42743fa0b587728186ae08143e7357dd # main
