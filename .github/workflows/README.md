@@ -31,6 +31,7 @@
 | Workflow | Status | 主目的 | トリガー | 依存アクション |
 | --- | --- | --- | --- | --- |
 | [auto-release.yml](./auto-release.yml) | [![Release](https://github.com/rysk-tanaka/swagmark/actions/workflows/auto-release.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/auto-release.yml) | 公開系ジョブのオーケストレーション（major tag、npm、GHCR） | `push` (main, `package.json`), `workflow_dispatch` | `rysk-tanaka/workflows` (release-on-version-change) |
+| [docker-publish.yml](./docker-publish.yml) | [![Docker](https://github.com/rysk-tanaka/swagmark/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/rysk-tanaka/swagmark/actions/workflows/docker-publish.yml) | 最新リリースの Docker イメージをビルドし、Grype でスキャンして GHCR に公開（来歴と SBOM 付き）。PR では公開せずにビルドとスキャンのみ | `workflow_call`, `schedule` (`30 21 * * 0`), `workflow_dispatch`, `pull_request` (`Dockerfile`) | `docker/build-push-action@v7`, `anchore/scan-action@v7`, `github/codeql-action/upload-sarif@v4`, `actions/attest@v4` |
 
 ## Issue 自動化
 
@@ -55,6 +56,7 @@
 | [issue-scan.yml](./issue-scan.yml) | [issue-implement.yml](./issue-implement.yml) | `claude-implement` ラベル付与で実装ワークフローを起動 |
 | [issue-implement.yml](./issue-implement.yml) | [claude-code-review.yml](./claude-code-review.yml) | PR 作成後に `claude-review` ラベル付与でレビューを起動 |
 | [auto-release.yml](./auto-release.yml) | release-on-version-change (external) | `workflow_call` でリリース処理を委譲 |
+| [auto-release.yml](./auto-release.yml) | [docker-publish.yml](./docker-publish.yml) | リリース作成時に `workflow_call` で Docker イメージを公開 |
 
 ## claude-code-action の権限メモ
 
