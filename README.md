@@ -158,9 +158,22 @@ jobs:
 
 ```bash
 docker run --rm \
-  -v $(pwd):/work \
+  --user "$(id -u):$(id -g)" \
+  -v "$(pwd):/work" \
   ghcr.io/rysk-tanaka/swagmark \
-  /work/openapi.yaml -o /work/docs/
+  openapi.yaml -o docs/
+```
+
+コンテナの作業ディレクトリはマウントした `/work` なので、相対パスはカレントディレクトリからの位置で指定できます。
+イメージは root ではなく `node` ユーザーで動きます。
+Linux では `--user` を付けないと、出力先に書き込めないことがあります。
+
+イメージは最新のリリースを毎週ビルドし直して公開しています（[docker-publish.yml](./.github/workflows/docker-publish.yml)）。
+公開前に Grype でスキャンし、ビルドの来歴（provenance）と SBOM を付けています。
+どのコミットとワークフローからビルドされたかは、次のコマンドで確かめられます。
+
+```bash
+gh attestation verify oci://ghcr.io/rysk-tanaka/swagmark:latest --owner rysk-tanaka
 ```
 
 ---
@@ -172,6 +185,7 @@ swagmark/
 ├── .github/
 │   └── workflows/
 │       ├── auto-release.yml  # リリース + npm + Docker 自動公開
+│       ├── docker-publish.yml # Docker イメージのビルド・スキャン・公開（毎週）
 │       └── test.yml          # テスト自動実行
 ├── action.yml                # GitHub Actions 定義
 ├── docs/

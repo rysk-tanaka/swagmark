@@ -10,6 +10,14 @@
       "description": "Last release 4.0.1 (2020); custom templates and markdown-it override require manual compatibility checks",
       "matchDepNames": ["widdershins"],
       "enabled": false
+    },
+    {
+      "description": "The base image of the Dockerfile is pinned by digest, and digest updates are automerged: they carry the OS fixes that the weekly rebuild in docker-publish.yml publishes. A digest has no release timestamp of its own, so minimumReleaseAge would keep renovate/stability-days pending",
+      "matchManagers": ["dockerfile"],
+      "matchUpdateTypes": ["pin", "digest"],
+      "pinDigests": true,
+      "minimumReleaseAge": null,
+      "automerge": true
     }
   ]
 }

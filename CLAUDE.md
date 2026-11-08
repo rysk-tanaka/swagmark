@@ -138,7 +138,8 @@ markdownlint 抑制は二層構造で運用している。
 - `auto-release.yml` — `package.json` の version 変更を検知し、`rysk-tanaka/workflows` の reusable workflow 経由でリリースを実行。publish 系ジョブ（major tag、npm、Docker）のオーケストレーション
   - メジャーバージョンタグ (`v0`) の更新 — `vars.PUBLISH_ACTION == 'true'` で有効化
   - npm レジストリへの公開 — `vars.PUBLISH_NPM == 'true'` + `NPM_TOKEN` シークレットで有効化
-  - Docker イメージの GHCR への push — `vars.PUBLISH_DOCKER == 'true'` で有効化
+  - Docker イメージの GHCR への push — `vars.PUBLISH_DOCKER == 'true'` で有効化。ビルド・スキャン・公開は `docker-publish.yml` を `workflow_call` で呼び出す
+- `docker-publish.yml` — 最新リリースの Docker イメージをビルドし、Grype でスキャンして GHCR に公開（provenance・SBOM・attestation 付き）。リリース時のほか毎週月曜にベースイメージを更新して作り直す。Dockerfile を変える PR ではビルドとスキャンのみ
   - `workflow_dispatch` で手動再実行にも対応（既存タグは安全にスキップ）
 
 ### ラッパーワークフロー（外部 reusable workflow を呼び出し）
