@@ -140,7 +140,7 @@ markdownlint 抑制は二層構造で運用している。
   - npm レジストリへの公開 — `vars.PUBLISH_NPM == 'true'` で有効化。npm の Trusted Publishing（OIDC）で段階公開（`npm stage publish`）するので `NPM_TOKEN` は不要。仮置きされた版は npmjs.com か `npm stage approve` で承認（2FA）すると公開される。Trusted Publisher は `auto-release.yml` を登録し、直接公開（`npm publish`）は許可していない
   - Docker イメージの GHCR への push — `vars.PUBLISH_DOCKER == 'true'` で有効化。ビルド・スキャン・公開は `docker-publish.yml` を `workflow_call` で呼び出す
   - `workflow_dispatch` で手動再実行にも対応（既存タグは安全にスキップ）
-- `docker-publish.yml` — 最新リリースの Docker イメージをビルドし、Grype でスキャンして GHCR に公開（provenance・SBOM・attestation 付き）。リリース時のほか毎週月曜にベースイメージを更新して作り直す。Dockerfile を変える PR ではビルドとスキャンのみ
+- `docker-publish.yml` — 最新リリースの Docker イメージをビルドし、Grype でスキャンして GHCR に公開（provenance・SBOM・attestation 付き）。リリース時のほか毎週月曜にベースイメージを更新して作り直す。アプリのコードはリリースタグから、Dockerfile（Renovate がベースの digest を上げる）は main から取り、ビルドしたタグとコミットは OCI ラベルに残す。Dockerfile を変える PR ではビルドとスキャンのみ
 
 ### ラッパーワークフロー（外部 reusable workflow を呼び出し）
 
