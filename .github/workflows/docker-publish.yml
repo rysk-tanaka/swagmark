@@ -3,7 +3,9 @@ name: Docker
 # Builds the image of the latest release, scans it, and publishes it to GHCR.
 # - Release: called from auto-release.yml when a release is created.
 # - Weekly: rebuilds the same release on the current base image, so the published tags do not
-#   keep the OS packages of the day of the release. Renovate updates the digest in the Dockerfile.
+#   keep the OS packages of the day of the release. Renovate updates the base image digest in the
+#   Dockerfile on main, so the Dockerfile is taken from the commit this workflow runs on, while the
+#   application code comes from the release tag.
 # - Pull request: builds and scans the Dockerfile of the branch without publishing.
 
 on:
@@ -60,12 +62,36 @@ jobs:
           ref: ${{ steps.release.outputs.tag }}
           persist-credentials: false
 
+      # The Dockerfile of a release tag keeps the base image digest of the day of the release.
+      - name: Check out the Dockerfile of the workflow's commit
+        if: env.IS_PUBLISH == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: .docker-build
+          sparse-checkout: Dockerfile
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Resolve the Dockerfile and the source revision
+        id: build
+        env:
+          IS_PUBLISH: ${{ env.IS_PUBLISH }}
+        run: |
+          set -euo pipefail
+          if [[ "$IS_PUBLISH" == "true" ]]; then
+            echo "dockerfile=.docker-build/Dockerfile" >> "$GITHUB_OUTPUT"
+          else
+            echo "dockerfile=Dockerfile" >> "$GITHUB_OUTPUT"
+          fi
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
       - name: Build the image for checks
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
+          file: ${{ steps.build.outputs.dockerfile }}
           load: true
           tags: swagmark:check
           cache-from: type=gha
@@ -109,11 +135,17 @@ jobs:
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
+          file: ${{ steps.build.outputs.dockerfile }}
           push: true
           tags: |
             ${{ env.IMAGE }}:${{ steps.release.outputs.tag }}
             ${{ env.IMAGE }}:${{ steps.release.outputs.major }}
             ${{ env.IMAGE }}:latest
+          # The provenance names the workflow's commit; these name the release that was built.
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.version=${{ steps.release.outputs.tag }}
+            org.opencontainers.image.revision=${{ steps.build.outputs.revision }}
           provenance: mode=max
           sbom: true
           cache-from: type=gha
