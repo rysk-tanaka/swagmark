@@ -137,10 +137,10 @@ markdownlint 抑制は二層構造で運用している。
 - `ci-auto-fix.yml` — "Test" ワークフロー失敗時に Claude が自動修正して PR ブランチにプッシュ（再帰防止: 直前コミットが `github-actions[bot]` ならスキップ）
 - `auto-release.yml` — `package.json` の version 変更を検知し、`rysk-tanaka/workflows` の reusable workflow 経由でリリースを実行。publish 系ジョブ（major tag、npm、Docker）のオーケストレーション
   - メジャーバージョンタグ (`v0`) の更新 — `vars.PUBLISH_ACTION == 'true'` で有効化
-  - npm レジストリへの公開 — `vars.PUBLISH_NPM == 'true'` で有効化。npm の Trusted Publishing（OIDC）で公開するので `NPM_TOKEN` は不要。npmjs.com のパッケージ設定で `auto-release.yml` を Trusted Publisher に登録しておく
+  - npm レジストリへの公開 — `vars.PUBLISH_NPM == 'true'` で有効化。npm の Trusted Publishing（OIDC）で段階公開（`npm stage publish`）するので `NPM_TOKEN` は不要。仮置きされた版は npmjs.com か `npm stage approve` で承認（2FA）すると公開される。Trusted Publisher は `auto-release.yml` を登録し、直接公開（`npm publish`）は許可していない
   - Docker イメージの GHCR への push — `vars.PUBLISH_DOCKER == 'true'` で有効化。ビルド・スキャン・公開は `docker-publish.yml` を `workflow_call` で呼び出す
-- `docker-publish.yml` — 最新リリースの Docker イメージをビルドし、Grype でスキャンして GHCR に公開（provenance・SBOM・attestation 付き）。リリース時のほか毎週月曜にベースイメージを更新して作り直す。Dockerfile を変える PR ではビルドとスキャンのみ
   - `workflow_dispatch` で手動再実行にも対応（既存タグは安全にスキップ）
+- `docker-publish.yml` — 最新リリースの Docker イメージをビルドし、Grype でスキャンして GHCR に公開（provenance・SBOM・attestation 付き）。リリース時のほか毎週月曜にベースイメージを更新して作り直す。Dockerfile を変える PR ではビルドとスキャンのみ
 
 ### ラッパーワークフロー（外部 reusable workflow を呼び出し）
 
