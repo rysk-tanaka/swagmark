@@ -67,38 +67,31 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # npm trusted publishing: npm exchanges this job's OIDC token for the publish, so no npm
+      # token is stored in the repository. npmjs.com trusts auto-release.yml of this repository.
+      id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Check NPM_TOKEN
-        run: |
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "::error::PUBLISH_NPM=true が設定されていますが NPM_TOKEN シークレットが見つかりません"
-            exit 1
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: corepack enable pnpm
+        with:
+          persist-credentials: false
+      # Node 24 ships npm 11.5.1 or later, which trusted publishing needs.
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-          cache: pnpm
           registry-url: https://registry.npmjs.org
-      - run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # npm publish, not pnpm publish: the npm CLI does the OIDC exchange and attaches provenance.
+      # The package has no build step or workspace dependencies, so nothing is installed first.
       - name: Publish to npm
         run: |
           PKG_NAME=$(jq -r '.name' package.json)
           PKG_VERSION=$(jq -r '.version' package.json)
-          pnpm publish --access public --no-git-checks || {
+          npm publish --access public || {
             if npm view "${PKG_NAME}@${PKG_VERSION}" version > /dev/null 2>&1; then
               echo "Version ${PKG_VERSION} already published, skipping"
             else
               exit 1
             fi
           }
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   docker:
     needs: create-release
