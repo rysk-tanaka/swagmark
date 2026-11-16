@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "commander": "^15.0.0",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "^5.0.0",
     "widdershins": "^4.0.1"
   },
   "pnpm": {
